@@ -8,10 +8,11 @@ public class PlayerController : MonoBehaviour
     private float walkSpeed = 5f;
     [SerializeField]
     private float sprintSpeed = 7f;
+    private float targetSpeed = -1f;
     [SerializeField]
     [Range(0.15f, 10)]
     private float acceleration = 5;
-    Vector2 currentVelocity;
+    Vector3 currentVelocity;
     private bool isMoving = false;
     private bool isSprinting = false;
     [SerializeField]
@@ -26,13 +27,13 @@ public class PlayerController : MonoBehaviour
     private void OnSprintStart()
     {
         isSprinting = true;
-        Move(sprintSpeed);
+        targetSpeed = sprintSpeed;
     }
 
     private void OnSprintEnd()
     {
         isSprinting = false;
-        Move(walkSpeed);
+        targetSpeed = walkSpeed;
     }
 
     private void OnMove(InputValue value)
@@ -40,6 +41,8 @@ public class PlayerController : MonoBehaviour
         isMoving = true;
         Vector2 v2 = value.Get<Vector2>();
         moveDirection = new Vector3(v2.x, 0, v2.y);
+
+        if (targetSpeed == -1f) targetSpeed = walkSpeed;
     }
 
     private void OnMoveEnd(InputValue value)
@@ -49,15 +52,13 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (isMoving) Move(walkSpeed);
+        if (isMoving) Move();
     }
 
-    private void Move(float speed)
+    private void Move()
     {
-        print("Move direction(1):" + moveDirection * speed);
-        rgbody.linearVelocity = Vector2.SmoothDamp(rgbody.linearVelocity, moveDirection * speed, ref currentVelocity, 0.1f / acceleration);
-        print("Move direction(2):" + moveDirection * speed);
-        print(rgbody.linearVelocity);
+        Vector3 targetVelocity = moveDirection * targetSpeed;
+        rgbody.linearVelocity = Vector3.SmoothDamp(rgbody.linearVelocity, targetVelocity, ref currentVelocity, 0.1f / acceleration);
     }
 
     private void OnJump()
