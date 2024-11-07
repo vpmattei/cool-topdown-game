@@ -3,66 +3,52 @@ using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
-    public GameObject ballToFolow;
-
-    private Rigidbody _rigidbody;
+    private Rigidbody rgbody;
     [SerializeField]
-    private float _speed = 5f;
+    private float walkSpeed = 5f;
     [SerializeField]
-    private bool _isSprinting = false;
-    private int _sprintBoost = 3;
+    private float sprintSpeed = 7f;
     [SerializeField]
-    private int _jumpHeight = 10;
-    private Vector3 _moveDirection = new Vector3(0, 0, 0);
+    [Range(0.1f,10)]
+    private float acceleration = 5;
+    Vector2 currentVelocity;
+    [SerializeField]
+    private bool isSprinting = false;
+    [SerializeField]
+    private int jumpHeight = 10;
+    private Vector3 moveDirection = new Vector3(0, 0, 0);
 
     private void Awake()
     {
-        _rigidbody = GetComponent<Rigidbody>();
+        rgbody = GetComponent<Rigidbody>();
     }
 
     private void OnSprintStart()
     {
-        _speed *= _sprintBoost;
-        _isSprinting = true;
-        Move();
+        isSprinting = true;
+        Move(sprintSpeed);
     }
 
     private void OnSprintEnd()
     {
-        _speed /= _sprintBoost;
-        _isSprinting = false;
-        Move();
+        isSprinting = false;
+        Move(walkSpeed);
     }
 
     private void OnMove(InputValue value)
     {
         Vector2 v2 = value.Get<Vector2>();
-        _moveDirection = new Vector3(v2.x, 0, v2.y);
-
-        // Move();
+        moveDirection = new Vector3(v2.x, 0, v2.y);
+        Move(walkSpeed);
     }
 
-    private void FixedUpdate()
+    private void Move(float speed)
     {
-        if (ballToFolow != null)
-        {
-            if (_moveDirection.x != 0 || _moveDirection.z != 0)
-            {
-                if (_isSprinting) ballToFolow.gameObject.transform.position = transform.position + _moveDirection;
-                else ballToFolow.gameObject.transform.position = transform.position + _moveDirection/2;
-            }
-        }
-    }
-
-    private void Move()
-    {
-        _rigidbody.linearVelocity = new Vector3(_moveDirection.x * _speed,
-                                                _rigidbody.linearVelocity.y,
-                                                _moveDirection.z * _speed);
+        rgbody.linearVelocity = Vector2.SmoothDamp(rgbody.linearVelocity, moveDirection * speed, ref currentVelocity, 0.1f / acceleration);
     }
 
     private void OnJump()
     {
-        _rigidbody.AddForce(new Vector3(0, 10, 0) * _jumpHeight);
+        rgbody.AddForce(new Vector3(0, 10, 0) * jumpHeight);
     }
 }
