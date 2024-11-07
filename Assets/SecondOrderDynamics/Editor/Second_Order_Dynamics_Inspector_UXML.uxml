@@ -1,0 +1,7 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="True">
+    <ui:Slider picking-mode="Ignore" label="F" value="1" high-value="10" low-value="1E-06" binding-path="m_F" show-input-field="true" name="F_Slider" tabindex="0" direction="Horizontal" inverted="false" />
+    <ui:Slider picking-mode="Ignore" label="Z" value="0.5" high-value="5" binding-path="m_Z" show-input-field="true" name="Z_Slider" />
+    <ui:Slider picking-mode="Ignore" label="R" value="-2" high-value="15" show-input-field="true" inverted="false" name="R_Slider" binding-path="m_R" low-value="-15" />
+    <uie:ObjectField label="Follow Target" binding-path="m_Target" name="Follow_Target" style="flex-direction: row; align-items: stretch; justify-content: flex-start; align-self: stretch;" />
+    <uie:CurveField label="Function Curve" binding-path="m_FunctionCurve" name="Function_Curve" focusable="true" style="background-color: rgb(70, 70, 70); min-height: 160px; flex-direction: column; opacity: 1; display: flex;" />
+</ui:UXML>
