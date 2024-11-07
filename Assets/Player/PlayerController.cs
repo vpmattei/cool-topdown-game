@@ -9,10 +9,10 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private float sprintSpeed = 7f;
     [SerializeField]
-    [Range(0.1f,10)]
+    [Range(0.15f, 10)]
     private float acceleration = 5;
     Vector2 currentVelocity;
-    [SerializeField]
+    private bool isMoving = false;
     private bool isSprinting = false;
     [SerializeField]
     private int jumpHeight = 10;
@@ -37,14 +37,27 @@ public class PlayerController : MonoBehaviour
 
     private void OnMove(InputValue value)
     {
+        isMoving = true;
         Vector2 v2 = value.Get<Vector2>();
         moveDirection = new Vector3(v2.x, 0, v2.y);
-        Move(walkSpeed);
+    }
+
+    private void OnMoveEnd(InputValue value)
+    {
+        isMoving = false;
+    }
+
+    void FixedUpdate()
+    {
+        if (isMoving) Move(walkSpeed);
     }
 
     private void Move(float speed)
     {
+        print("Move direction(1):" + moveDirection * speed);
         rgbody.linearVelocity = Vector2.SmoothDamp(rgbody.linearVelocity, moveDirection * speed, ref currentVelocity, 0.1f / acceleration);
+        print("Move direction(2):" + moveDirection * speed);
+        print(rgbody.linearVelocity);
     }
 
     private void OnJump()
