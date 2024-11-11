@@ -96,18 +96,9 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "SprintStart",
+                    "name": "Dash",
                     "type": "Button",
                     "id": "72d288c0-40c1-4c37-a5e4-72ddc90b9cde",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
-                    "name": "SprintEnd",
-                    "type": "Button",
-                    "id": "ce78d0f8-f0c1-4237-b7b8-3c4c544560cc",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -507,18 +498,7 @@
                     "interactions": "Press",
                     "processors": "",
                     "groups": "",
-                    "action": "SprintStart",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "f3459472-71a5-4204-8a36-120ac39ca948",
-                    "path": "<Keyboard>/shift",
-                    "interactions": "Press(behavior=1)",
-                    "processors": "",
-                    "groups": "",
-                    "action": "SprintEnd",
+                    "action": "Dash",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
