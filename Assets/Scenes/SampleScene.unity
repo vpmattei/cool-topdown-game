@@ -9922,7 +9922,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   walkSpeed: 5
   acceleration: 20
-  deceleration: 5
+  deceleration: 20
   dashImpulseMagnitude: 30
   jumpHeight: 20
   isGrounded: 1
