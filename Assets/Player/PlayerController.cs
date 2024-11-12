@@ -67,28 +67,27 @@ public class PlayerController : MonoBehaviour
         if (isGrounded)
         {
             rgbody.AddForce(jumpHeight * Vector3.up, ForceMode.Impulse);
+            print(rgbody.linearVelocity);
         }
     }
 
     private void CheckGrounded()
     {
         // Cast a ray downward
-        isGrounded = Physics.Raycast(transform.position - new Vector3(0, .98f, 0), Vector3.down, groundCheckDistance, groundLayer);
+        isGrounded = Physics.Raycast(transform.position - new Vector3(0, .8f, 0), Vector3.down, groundCheckDistance, groundLayer);
         rgbody.useGravity = !isGrounded;
 
         // Visualize the ray in Scene view
-        Debug.DrawRay(transform.position - new Vector3(0, .98f, 0), Vector3.down * groundCheckDistance, isGrounded ? Color.green : Color.red);
+        Debug.DrawRay(transform.position - new Vector3(0, .8f, 0), Vector3.down * groundCheckDistance, isGrounded ? Color.green : Color.red);
     }
 
     void Update()
     {
-        Vector3 forward = transform.TransformDirection(Vector3.forward) * 10;
-        Debug.DrawRay(transform.position + Vector3.forward, forward, Color.green);
-        CheckGrounded();
     }
 
     void FixedUpdate()
     {
+        CheckGrounded();
         if (isMoving) Move();
         else ApplyDeceleration();
 
@@ -103,7 +102,6 @@ public class PlayerController : MonoBehaviour
     {
         Vector3 targetVelocity = moveDirection * targetSpeed;
         rgbody.linearVelocity = Vector3.SmoothDamp(rgbody.linearVelocity, targetVelocity, ref currentVelocity, 0.1f / acceleration);
-        print("Velocity:" + rgbody.linearVelocity);
     }
 
     private void ApplyDeceleration()

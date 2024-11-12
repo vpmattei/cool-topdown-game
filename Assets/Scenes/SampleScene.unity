@@ -9927,7 +9927,7 @@ MonoBehaviour:
   dashImpulseMagnitude: 10
   jumpHeight: 10
   isGrounded: 1
-  groundCheckDistance: 0.5
+  groundCheckDistance: 0.4
   groundLayer:
     serializedVersion: 2
     m_Bits: 8
