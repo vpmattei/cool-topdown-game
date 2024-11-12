@@ -9741,7 +9741,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 3, y: 1, z: 3}
+  m_LocalScale: {x: 10, y: 1, z: 10}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -9921,17 +9921,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   walkSpeed: 5
-  sprintSpeed: 7
-  acceleration: 5
+  acceleration: 20
   deceleration: 5
-  dashImpulseMagnitude: 10
-  jumpHeight: 10
+  dashImpulseMagnitude: 30
+  jumpHeight: 20
   isGrounded: 1
   groundCheckDistance: 0.4
   groundLayer:
     serializedVersion: 2
     m_Bits: 8
-  gravityForce: 10
+  gravityForce: 60
+  applyGravityForceThreshold: 19.5
 --- !u!54 &1475574904
 Rigidbody:
   m_ObjectHideFlags: 0
