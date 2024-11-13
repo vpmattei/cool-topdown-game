@@ -7,11 +7,11 @@ public class PlayerController : MonoBehaviour
     private Camera cam;
 
     #region Movement Variables
-    [SerializeField, Range(1, 15)] private float walkSpeed = 5f;
-    [SerializeField, Range(0.15f, 30)] private float acceleration = 5f;
-    [SerializeField, Range(0.15f, 30)] private float deceleration = 5f;
-    [SerializeField, Range(2, 30)] private float rotationSpeed = 2f;
-    [SerializeField] private float dashImpulseMagnitude = 10f;
+    [SerializeField, Range(1, 15)] private float walkSpeed = 7;
+    [SerializeField, Range(0.15f, 50)] private float acceleration = 20;
+    [SerializeField, Range(0.15f, 50)] private float deceleration = 20;
+    [SerializeField, Range(2, 30)] private float rotationSpeed = 10;
+    [SerializeField] private float dashImpulseMagnitude = 10;
 
     private float targetSpeed = -1f;
     private Vector3 moveDirection = Vector3.zero;
@@ -23,6 +23,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float jumpHeight = 10f;
     [SerializeField] private bool isGrounded = true;
     [SerializeField] private float groundCheckDistance = 0.5f;
+    [SerializeField] private float rayGroundCheckStartPos = 0;
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private float gravityForce = 60f;
     [SerializeField] private float applyGravityForceThreshold = 10f;
@@ -37,7 +38,6 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        CastRayFromMouse();
     }
 
     private void FixedUpdate()
@@ -55,6 +55,7 @@ public class PlayerController : MonoBehaviour
         }
 
         DrawDebugVectors();
+        RotatePlayerToMousePoint();
     }
     #endregion
 
@@ -108,7 +109,7 @@ public class PlayerController : MonoBehaviour
     {
         Vector3 horizontalVelocity = new Vector3(rgbody.linearVelocity.x, 0, rgbody.linearVelocity.z);
 
-        if (horizontalVelocity.magnitude > 0.25f)
+        if (horizontalVelocity.magnitude > 0.35f)
         {
             Vector3 decelerationForce = -horizontalVelocity.normalized * deceleration;
             rgbody.AddForce(decelerationForce, ForceMode.Acceleration);
@@ -126,7 +127,7 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     private void CheckGrounded()
     {
-        Vector3 rayOrigin = transform.position - new Vector3(0, 0.8f, 0);
+        Vector3 rayOrigin = transform.position - new Vector3(0, rayGroundCheckStartPos, 0);
         isGrounded = Physics.Raycast(rayOrigin, Vector3.down, groundCheckDistance, groundLayer);
         rgbody.useGravity = !isGrounded;
 
@@ -148,7 +149,7 @@ public class PlayerController : MonoBehaviour
     }
     #endregion
 
-    private void CastRayFromMouse()
+    private void RotatePlayerToMousePoint()
     {
         Vector3 mousePos = Input.mousePosition;
         mousePos.z = 100f;
