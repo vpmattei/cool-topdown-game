@@ -9920,10 +9920,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7f348de185a614a4c833064a0dff6645, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  walkSpeed: 5
+  walkSpeed: 7
   acceleration: 20
   deceleration: 20
-  dashImpulseMagnitude: 30
+  dashImpulseMagnitude: 40
   jumpHeight: 20
   isGrounded: 1
   groundCheckDistance: 0.4

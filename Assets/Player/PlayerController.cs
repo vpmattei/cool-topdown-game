@@ -4,11 +4,13 @@ using UnityEngine.InputSystem;
 public class PlayerController : MonoBehaviour
 {
     private Rigidbody rgbody;
+    private Camera cam;
 
     #region Movement Variables
     [SerializeField, Range(1, 15)] private float walkSpeed = 5f;
     [SerializeField, Range(0.15f, 30)] private float acceleration = 5f;
     [SerializeField, Range(0.15f, 30)] private float deceleration = 5f;
+    [SerializeField, Range(2, 30)] private float rotationSpeed = 2f;
     [SerializeField] private float dashImpulseMagnitude = 10f;
 
     private float targetSpeed = -1f;
@@ -30,6 +32,12 @@ public class PlayerController : MonoBehaviour
     private void Awake()
     {
         rgbody = GetComponent<Rigidbody>();
+        cam = Camera.main;
+    }
+
+    private void Update()
+    {
+        CastRayFromMouse();
     }
 
     private void FixedUpdate()
@@ -81,6 +89,9 @@ public class PlayerController : MonoBehaviour
     #endregion
 
     #region Movement and Deceleration
+    /// <summary>
+    /// Applies movement forces to move the player using the direction from the move input.
+    /// </summary>
     private void Move()
     {
         Vector3 targetVelocity = moveDirection * targetSpeed;
@@ -90,6 +101,9 @@ public class PlayerController : MonoBehaviour
         rgbody.AddForce(force, ForceMode.Acceleration);
     }
 
+    /// <summary>
+    /// Gradually slows down the player when movement input stops.
+    /// </summary>
     private void ApplyDeceleration()
     {
         Vector3 horizontalVelocity = new Vector3(rgbody.linearVelocity.x, 0, rgbody.linearVelocity.z);
@@ -107,6 +121,9 @@ public class PlayerController : MonoBehaviour
     #endregion
 
     #region Ground Check and Debugging
+    /// <summary>
+    /// Checks if the player is grounded using a downward raycast.
+    /// </summary>
     private void CheckGrounded()
     {
         Vector3 rayOrigin = transform.position - new Vector3(0, 0.8f, 0);
@@ -116,6 +133,9 @@ public class PlayerController : MonoBehaviour
         Debug.DrawRay(rayOrigin, Vector3.down * groundCheckDistance, isGrounded ? Color.green : Color.red);
     }
 
+    /// <summary>
+    /// Draws velocity, acceleration, and force vectors in the Scene view for debugging.
+    /// </summary>
     private void DrawDebugVectors()
     {
         Vector3 playerPosition = transform.position;
@@ -127,4 +147,25 @@ public class PlayerController : MonoBehaviour
         Debug.DrawRay(playerPosition, force, Color.yellow); // Force
     }
     #endregion
+
+    private void CastRayFromMouse()
+    {
+        Vector3 mousePos = Input.mousePosition;
+        mousePos.z = 100f;
+        mousePos = cam.ScreenToWorldPoint(mousePos);
+        Debug.DrawRay(cam.transform.position, mousePos - cam.transform.position, Color.green);
+
+        Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+
+        if (Physics.Raycast(ray, out hit, 100))
+        {
+            Vector3 directionToLookAt = (hit.point - transform.position).normalized;
+            Quaternion lookRotation = Quaternion.LookRotation(directionToLookAt);
+
+            transform.rotation = Quaternion.Slerp(transform.rotation,
+                                                  new Quaternion(0, lookRotation.y, 0, lookRotation.w),
+                                                  Time.deltaTime * rotationSpeed);
+        }
+    }
 }
