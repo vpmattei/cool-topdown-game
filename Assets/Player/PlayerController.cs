@@ -5,6 +5,7 @@ public class PlayerController : MonoBehaviour
 {
     private Rigidbody rgbody;
     private Camera cam;
+    private Animator animator;
 
     #region Movement Variables
     [SerializeField, Range(1, 15)] private float walkSpeed = 7;
@@ -16,7 +17,6 @@ public class PlayerController : MonoBehaviour
     private float targetSpeed = -1f;
     private Vector3 moveDirection = Vector3.zero;
     private Vector3 currentVelocity;
-    private bool isMoving = false;
     #endregion
 
     #region Jump and Gravity Variables
@@ -29,15 +29,23 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float applyGravityForceThreshold = 10f;
     #endregion
 
+    #region State Variables
+    private bool isMoving = false;
+    #endregion
+
     #region Unity Methods
     private void Awake()
     {
         rgbody = GetComponent<Rigidbody>();
         cam = Camera.main;
+        animator = GetComponent<Animator>();
     }
 
     private void Update()
     {
+        animator.SetFloat("XDir", rgbody.linearVelocity.x / walkSpeed);
+        animator.SetFloat("YDir", rgbody.linearVelocity.z / walkSpeed);
+        Debug.Log(rgbody.linearVelocity);
     }
 
     private void FixedUpdate()
@@ -63,6 +71,7 @@ public class PlayerController : MonoBehaviour
     private void OnMove(InputValue value)
     {
         isMoving = true;
+        animator.SetBool("IsMoving", true);
         Vector2 input = value.Get<Vector2>();
         moveDirection = new Vector3(input.x, 0, input.y);
         targetSpeed = walkSpeed;
@@ -71,6 +80,7 @@ public class PlayerController : MonoBehaviour
     private void OnMoveEnd(InputValue value)
     {
         isMoving = false;
+        animator.SetBool("IsMoving", false);
     }
 
     private void OnDash()
@@ -142,7 +152,7 @@ public class PlayerController : MonoBehaviour
         Vector3 playerPosition = transform.position;
 
         Debug.DrawRay(playerPosition + new Vector3(0, 1f, 0), rgbody.linearVelocity, Color.cyan); // Velocity
-        Vector3 acceleration = (rgbody.linearVelocity - currentVelocity) / Time.fixedDeltaTime;
+        Vector3 acceleration = (rgbody.linearVelocity - rgbody.linearVelocity) / Time.fixedDeltaTime;
         Debug.DrawRay(playerPosition + new Vector3(0, 0.5f, 0), acceleration, Color.magenta); // Acceleration
         Vector3 force = rgbody.mass * acceleration;
         Debug.DrawRay(playerPosition, force, Color.yellow); // Force
