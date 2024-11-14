@@ -43,9 +43,17 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        animator.SetFloat("XDir", rgbody.linearVelocity.x / walkSpeed);
-        animator.SetFloat("YDir", rgbody.linearVelocity.z / walkSpeed);
-        Debug.Log(rgbody.linearVelocity);
+        // Get the player's current rotation as a quaternion
+        Quaternion playerRotation = transform.rotation;
+
+        // Inverse the player's rotation to transform the world movement direction into the player's local space
+        Vector3 localMovementDirection = Quaternion.Inverse(playerRotation) * moveDirection;
+
+        // Return as a 2D vector in the player's local space
+        Debug.Log(new Vector2(localMovementDirection.x, localMovementDirection.z));
+
+        animator.SetFloat("XDir", localMovementDirection.x);
+        animator.SetFloat("YDir", localMovementDirection.z);
     }
 
     private void FixedUpdate()
@@ -152,10 +160,8 @@ public class PlayerController : MonoBehaviour
         Vector3 playerPosition = transform.position;
 
         Debug.DrawRay(playerPosition + new Vector3(0, 1f, 0), rgbody.linearVelocity, Color.cyan); // Velocity
-        Vector3 acceleration = (rgbody.linearVelocity - rgbody.linearVelocity) / Time.fixedDeltaTime;
-        Debug.DrawRay(playerPosition + new Vector3(0, 0.5f, 0), acceleration, Color.magenta); // Acceleration
-        Vector3 force = rgbody.mass * acceleration;
-        Debug.DrawRay(playerPosition, force, Color.yellow); // Force
+
+        // [0,1] && 90° -> [-1,0]
     }
     #endregion
 
