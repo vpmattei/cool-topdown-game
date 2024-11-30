@@ -28,11 +28,17 @@ public class ProceduralAnimation : MonoBehaviour
 
     void Update()
     {
-        foreach (Leg leg in legs)
+        for (int i = 0; i < legs.Length; i++)
         {
-            leg.transform.position = leg.currentPosition;
+            legs[i].transform.position = legs[i].currentPosition;   // Keeps the leg in the same position
+
+            if (legIndex == i && currentStepInterval >= stepInterval && !legs[i].IsMoving())
+            {
+                legs[i].moveLeg = true;
+            }
+
+            if (legs[i].moveLeg) MoveLeg(legs[i]);    // Moves the leg with the current leg index
         }
-        MoveLeg(legs[legIndex]);    // Moves the leg with the current leg index
 
         if (currentStepInterval >= stepInterval)
         {
@@ -40,14 +46,13 @@ public class ProceduralAnimation : MonoBehaviour
             legIndex += 1;
             if (legIndex + 1 > legs.Length) legIndex = 0;   // Make leg index go back to the start of the leg list so we restart
         }
-        else
-        {
-            currentStepInterval += Time.deltaTime;
-        }
+
+        currentStepInterval += Time.deltaTime;
     }
 
-    private void MoveLeg(Leg leg)
+    public void MoveLeg(Leg leg)
     {
+        leg.isMoving = true;
         // transform.up = currentNormal;
 
         Ray bodyRay = new Ray(body.position + new Vector3(0, .5f, 0) + (body.right * leg.footSpacing), Vector3.down);
@@ -77,6 +82,8 @@ public class ProceduralAnimation : MonoBehaviour
             else
             {
                 leg.oldPosition = leg.newPosition;
+                leg.isMoving = false;
+                leg.moveLeg = false;
 
                 // oldNormal = newNormal;
             }
