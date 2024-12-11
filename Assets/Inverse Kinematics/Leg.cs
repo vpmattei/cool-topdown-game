@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class Leg : MonoBehaviour
 {
+    public string name;
     [HideInInspector] public Vector3 oldPosition, currentPosition, newPosition;
     [HideInInspector] public float footSpacing;
     [HideInInspector] public float lerp;

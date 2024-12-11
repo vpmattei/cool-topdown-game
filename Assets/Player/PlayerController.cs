@@ -50,7 +50,7 @@ public class PlayerController : MonoBehaviour
         Vector3 localMovementDirection = Quaternion.Inverse(playerRotation) * moveDirection;
 
         // Return as a 2D vector in the player's local space
-        Debug.Log(new Vector2(localMovementDirection.x, localMovementDirection.z));
+        // Debug.Log(new Vector2(localMovementDirection.x, localMovementDirection.z));
 
         animator.SetFloat("XDir", localMovementDirection.x);
         animator.SetFloat("YDir", localMovementDirection.z);
@@ -149,7 +149,7 @@ public class PlayerController : MonoBehaviour
         isGrounded = Physics.Raycast(rayOrigin, Vector3.down, groundCheckDistance, groundLayer);
         rgbody.useGravity = !isGrounded;
 
-        Debug.DrawRay(rayOrigin, Vector3.down * groundCheckDistance, isGrounded ? Color.green : Color.red);
+        Debug.DrawRay(rayOrigin, Vector3.down * groundCheckDistance, isGrounded ? Color.blue : Color.red);
     }
 
     /// <summary>
