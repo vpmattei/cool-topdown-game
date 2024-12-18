@@ -8,17 +8,23 @@ public class MoveLegDebugger : MonoBehaviour
     [Header("Movement Settings")]
     [SerializeField] private float stepDistance = 10f;   // The threshold after which movement should start
     [SerializeField] private float moveDuration = 2f;    // How long each leg moves
-    [SerializeField] private float stepHeight = 4f;    // How high each leg goes
+    [SerializeField] private float stepHeight = 4f;      // How high each leg goes
     [SerializeField] private float legInterval = 1f;     // Time interval between legs starting movement
 
     [Header("Legs")]
     [SerializeField] private List<LegDebug> legs = new List<LegDebug>();
 
+    [Header("Separate Start Times")]
+    [SerializeField] private bool useSeparateStartTimes = false;
+    [SerializeField] private List<float> separateStartTimes = new List<float>();    // Make sure separateStartTimes matches legs.Count if useSeparateStartTimes is true
+
     [Header("Debug Variables")]
     [SerializeField] private float raycastDistance = 30f;
+    [SerializeField] private GameObject circleRendererObject;
+    private CircleRenderer circleRenderer;
 
     [Tooltip("When true, the code runs through the sequence of moving legs.")]
-    public int movesToPerform = 0;
+    public bool shouldMove = false;
 
     // Internal state
     private float movementStartTime;
@@ -26,6 +32,7 @@ public class MoveLegDebugger : MonoBehaviour
     // Body position states
     private Vector3 currentBodyPosition;
     private Vector3 oldBodyPosition;
+    private float distanceMoved;
 
     void Start()
     {
@@ -33,6 +40,16 @@ public class MoveLegDebugger : MonoBehaviour
         if (Physics.Raycast(transform.position + new Vector3(0, 0.5f, 0), Vector3.down, out RaycastHit hit, raycastDistance, terrainLayer))
         {
             currentBodyPosition = oldBodyPosition = hit.point;
+        }
+
+        // Cache the CircleRenderer component
+        if (circleRendererObject != null)
+        {
+            circleRenderer = circleRendererObject.GetComponent<CircleRenderer>();
+        }
+        else
+        {
+            Debug.LogWarning("CircleRendererObject is not assigned.");
         }
     }
 
@@ -43,30 +60,39 @@ public class MoveLegDebugger : MonoBehaviour
         {
             currentBodyPosition = hit.point;
 
-            float distance = Vector3.Distance(oldBodyPosition, currentBodyPosition);
-            // UpdateStepDistanceUI(distance);
+            distanceMoved = Vector3.Distance(oldBodyPosition, currentBodyPosition);
 
             // Check if we should start moving legs
-            if (distance >= stepDistance)
+            if (distanceMoved >= stepDistance && !shouldMove)
             {
                 oldBodyPosition = currentBodyPosition;
 
-                if (movesToPerform == 0) movementStartTime = 0; // If this is the first move, then set the timer to 0
+                circleRenderer.DrawCircle(100, stepDistance, oldBodyPosition + new Vector3(0, .5f, 0));
+
+                if (!shouldMove) movementStartTime = 0; // If this is the first move, then set the timer to 0
                 // distanceMoved = 0f; // Reset the distance
 
                 for (int i = 0; i < legs.Count; i++)
                 {
-                    movesToPerform += 1;
+                    shouldMove = true;
+
                     var leg = legs[i];
 
-                    leg.StartMoveTime = i * legInterval;
+                    if (useSeparateStartTimes && i < separateStartTimes.Count)
+                    {
+                        leg.StartMoveTime = separateStartTimes[i];
+                    }
+                    else
+                    {
+                        leg.StartMoveTime = i * legInterval;
+                    }
+                    
                     leg.MovesToPerform += 1;
-                    Debug.Log(leg.LegName + " Leg interval: " + leg.StartMoveTime);
                 }
             }
         }
 
-        if (movesToPerform > 0)
+        if (shouldMove)
         {
             UpdateLegMovements();
         }
@@ -85,7 +111,7 @@ public class MoveLegDebugger : MonoBehaviour
             {
                 if (!leg.IsDone && leg.MovesToPerform > 0)
                 {
-                    leg.MoveLeg(currentBodyPosition + new Vector3(0, .5f, 0), moveDuration, stepHeight);
+                    leg.MoveLeg(currentBodyPosition + leg.FootOffset, moveDuration, stepHeight);
                     allLegsDone = false;
                 }
                 else
@@ -106,7 +132,7 @@ public class MoveLegDebugger : MonoBehaviour
 
     private void ResetMovement()
     {
-        movesToPerform = 0;
+        shouldMove = false;
 
         // Reset each leg so it can move again next time
         for (int i = 0; i < legs.Count; i++)
@@ -134,7 +160,7 @@ public class MoveLegDebugger : MonoBehaviour
         };
 
         GUILayout.BeginVertical("box");
-        // GUILayout.Label($"Distance Moved: {distanceMoved:F2}", style);
+        GUILayout.Label($"Distance Moved: {distanceMoved:F2}", style);
         GUILayout.Label($"Moves to perform: {totalMovesRemaining}", style);
         GUILayout.Label($"Movement Start Time: {movementStartTime:F2}", style);
         GUILayout.Label($"Leg Interval: {legInterval:F2}", style);

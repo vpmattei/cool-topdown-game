@@ -11,14 +11,15 @@ public class LegDebug : MonoBehaviour
     private Vector3 oldPosition;
     private Vector3 newPosition;
     private Vector3 currentPosition;
-    private float footSpacing;
+    public Vector3 footOffset;
     private float moveTimer = 0f;
-    private float startMoveTime;
+    public float startMoveTime;
     private bool isMoving = false;
     private bool isDone = false;
     private int movesToPerform = 0;
 
     public string LegName => legName;
+    public Vector3 FootOffset => footOffset;
     public bool IsMoving => isMoving;
     public bool IsDone => isDone;
     public float MoveTimer => moveTimer;
@@ -33,24 +34,32 @@ public class LegDebug : MonoBehaviour
         get { return startMoveTime; }
     }
 
+    [SerializeField] private LayerMask terrainLayer;
+
     // DEBUG
     public GameObject newPositionToMove;
 
     void Start()
     {
         body = transform.parent.gameObject;
-        footSpacing = transform.localPosition.x;
+        footOffset = transform.localPosition;
         isMoving = false;
         isDone = false;
         moveTimer = 1f;
-        if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, 30, LayerMask.NameToLayer("Ground")))
+        if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, 30, terrainLayer))
         {
-            transform.position = currentPosition = newPosition = oldPosition = hit.point;
+            currentPosition = newPosition = oldPosition = hit.point + new Vector3(0, .5f, 0);
         }
     }
 
     void Update()
     {
+        Debug.DrawRay(transform.position + new Vector3(0, 0.5f, 0), Vector3.down * 10, Color.yellow);
+        // if (Physics.Raycast(transform.position + new Vector3(0, 0.5f, 0), Vector3.down, out RaycastHit hit, 10, terrainLayer))
+        // {
+        //     Gizmos.DrawSphere(hit.point, 2);
+        // }
+
         transform.position = currentPosition;
     }
 
