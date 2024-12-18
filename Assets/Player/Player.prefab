@@ -3199,13 +3199,17 @@ MonoBehaviour:
   terrainLayer:
     serializedVersion: 2
     m_Bits: 8
-  body: {fileID: 313841374593022312}
   stepDuration: 1
   stepDistance: 0.6
   stepHeight: 0.4
   stepInterval: 0.25
   footOffset: {x: 0, y: 0.1, z: 0}
   legs: []
+  circleRenderer: {fileID: 0}
+  circles: []
+  leftLegDistanceText: {fileID: 0}
+  rightLegDistanceText: {fileID: 0}
+  currentLegText: {fileID: 0}
 --- !u!114 &303819125896300863
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3218,6 +3222,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea42d045d293d41358a1bb4d51d208c9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  name: right
   oldPosition: {x: 0, y: 0, z: 0}
   currentPosition: {x: 0, y: 0, z: 0}
   newPosition: {x: 0, y: 0, z: 0}
@@ -5169,13 +5174,17 @@ MonoBehaviour:
   terrainLayer:
     serializedVersion: 2
     m_Bits: 8
-  body: {fileID: 313841374593022312}
   stepDuration: 1
   stepDistance: 0.6
   stepHeight: 0.4
   stepInterval: 0.25
   footOffset: {x: 0, y: 0.1, z: 0}
   legs: []
+  circleRenderer: {fileID: 0}
+  circles: []
+  leftLegDistanceText: {fileID: 0}
+  rightLegDistanceText: {fileID: 0}
+  currentLegText: {fileID: 0}
 --- !u!114 &3245677387977741959
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5188,6 +5197,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea42d045d293d41358a1bb4d51d208c9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  name: left
   oldPosition: {x: 0, y: 0, z: 0}
   currentPosition: {x: 0, y: 0, z: 0}
   newPosition: {x: 0, y: 0, z: 0}
@@ -6089,7 +6099,7 @@ Rigidbody:
   m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 116
+  m_Constraints: 112
   m_CollisionDetection: 0
 --- !u!114 &7823598303826536273
 MonoBehaviour:
@@ -6178,7 +6188,6 @@ MonoBehaviour:
   terrainLayer:
     serializedVersion: 2
     m_Bits: 8
-  body: {fileID: 313841374593022312}
   stepDuration: 0.1
   stepDistance: 0.4
   stepHeight: 0.4
@@ -6187,6 +6196,13 @@ MonoBehaviour:
   legs:
   - {fileID: 3245677387977741959}
   - {fileID: 303819125896300863}
+  circleRenderer: {fileID: 202844136719166697, guid: fda4b3987420a4b49a249311c7876550, type: 3}
+  circles:
+  - {fileID: 0}
+  - {fileID: 0}
+  leftLegDistanceText: {fileID: 0}
+  rightLegDistanceText: {fileID: 0}
+  currentLegText: {fileID: 0}
 --- !u!1 &8827706003311233049
 GameObject:
   m_ObjectHideFlags: 0

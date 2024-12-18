@@ -14,15 +14,6 @@ public class CircleRenderer : MonoBehaviour
         circleRenderer = GetComponent<LineRenderer>();
     }
 
-    void Start()
-    {
-    }
-
-    void Update()
-    {
-        // DrawCircle(steps, radius);
-    }
-
     public void DrawCircle(int steps, float radius, Vector3 pos)
     {
         this.transform.position = pos;

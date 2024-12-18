@@ -3,101 +3,170 @@ using UnityEngine;
 
 public class ProceduralAnimation : MonoBehaviour
 {
-    [SerializeField] LayerMask terrainLayer;
-    [SerializeField] float stepDuration = 0.25f;
-    [SerializeField] float stepDistance = 0.6f;
-    [SerializeField] float stepHeight = 0.4f;
-    [SerializeField] float stepInterval = 0.25f;
-    private float currentStepInterval;
-    private int legIndex = 0;
-    [SerializeField] Vector3 footOffset = new Vector3(0, 0.1f, 0);
+    [Header("Settings")]
+    [SerializeField] private LayerMask terrainLayer;
+    [SerializeField] private float stepDuration = 0.25f;
+    [SerializeField] private float stepDistance = 0.6f;
+    [SerializeField] private float stepHeight = 0.4f;
+    [SerializeField] private float stepInterval = 0.25f;
+    [SerializeField] private float raycastDistance = 30f;
+    [SerializeField] private Vector3 footOffset = new Vector3(0, 0.1f, 0);
 
-    [SerializeField] Leg[] legs;
-    [SerializeField] GameObject circleRenderer;
-    [SerializeField] GameObject[] circles;
+    [Header("Legs")]
+    [SerializeField] private Leg[] legs;
 
-    // UI Elements for leg distances
+    [Header("Visualizations")]
+    [SerializeField] private GameObject circleRendererObject;
+
+    [Header("UI Elements")]
     [SerializeField] private TMP_Text leftLegDistanceText;
     [SerializeField] private TMP_Text rightLegDistanceText;
+    [SerializeField] private TMP_Text currentLegText;
+
+    private Vector3 oldBodyPosition;
+    private Vector3 currentBodyPosition;
+    private CircleRenderer circleRenderer;
+    private float currentStepInterval;
+    private int legIndex = 0;
 
     private void Start()
     {
-        currentStepInterval = 0;
+        // Setting old body position
+        if (Physics.Raycast(transform.position + new Vector3(0, 0.5f, 0), Vector3.down, out RaycastHit hit, raycastDistance, terrainLayer))
+        {
+            currentBodyPosition = oldBodyPosition = hit.point;
+        }
+
+        currentStepInterval = 0f;
+
+        // Cache the CircleRenderer component
+        if (circleRendererObject != null)
+        {
+            circleRenderer = circleRendererObject.GetComponent<CircleRenderer>();
+        }
+        else
+        {
+            Debug.LogWarning("CircleRendererObject is not assigned.");
+        }
+
+        // UI checks
+        if (leftLegDistanceText == null)
+            Debug.LogWarning("LeftLegDistanceText is not assigned.");
+        if (rightLegDistanceText == null)
+            Debug.LogWarning("RightLegDistanceText is not assigned.");
+        if (currentLegText == null)
+            Debug.LogWarning("CurrentLegText is not assigned.");
     }
 
     void Update()
     {
-        Debug.DrawRay(this.transform.position + new Vector3(0, 0.5f, 0), new Vector3(0, -30, 0), Color.yellow);
-
-        for (int i = 0; i < legs.Length; i++)
+        Debug.DrawRay(transform.position + new Vector3(0, 0.5f, 0), Vector3.down * raycastDistance, Color.green);
+        if (Physics.Raycast(transform.position + new Vector3(0, 0.5f, 0), Vector3.down, out RaycastHit hit, raycastDistance, terrainLayer))
         {
-            legs[i].transform.position = legs[i].currentPosition; // Keeps the leg in the same position
+            currentBodyPosition = hit.point;
 
-            if (legIndex == i && currentStepInterval >= stepInterval && !legs[i].IsMoving())
+            float distance = Vector3.Distance(oldBodyPosition, currentBodyPosition);
+            UpdateStepDistanceUI(distance);
+
+            if (distance > stepDistance)
             {
-                legs[i].moveLeg = true;
+                for (int i = 0; i < legs.Length; i++) legs[i].shouldMove = true;
+
+                oldBodyPosition = currentBodyPosition;
             }
 
-            if (legs[i].moveLeg) MoveLeg(legs[i]); // Moves the leg with the current leg index
+            for (int i = 0; i < legs.Length; i++)
+            {
+                // Maintain the leg's transform position
+                legs[i].transform.position = legs[i].currentPosition;
+
+                // Move the leg if needed
+                if (legs[i].shouldMove)
+                {
+                    MoveLeg(legs[i]);
+                }
+            }
         }
 
+        // After checking legs, if interval is surpassed, possibly switch legs
         if (currentStepInterval >= stepInterval)
         {
-            currentStepInterval = 0;
-            legIndex = (legIndex + 1) % legs.Length; // Cycle leg index
+            currentStepInterval = 0f;
+
+            // Check if the current leg completed its move before switching
+            if (!legs[legIndex].IsMoving() && legs[legIndex].shouldMove == false)
+            {
+                legIndex = (legIndex + 1) % legs.Length;
+            }
         }
 
         currentStepInterval += Time.deltaTime;
+
+        UpdateCurrentLegUI();
     }
 
-    public void MoveLeg(Leg leg)
+    private void MoveLeg(Leg leg)
     {
         leg.isMoving = true;
 
-        Ray bodyRay = new Ray(this.transform.position + new Vector3(0, 0.5f, 0) + (this.transform.right * leg.footSpacing), Vector3.down);
-
-        if (Physics.Raycast(bodyRay, out RaycastHit hit, 30, terrainLayer.value))
+        Vector3 bodyPosition = transform.position + Vector3.up * 0.5f + transform.right * leg.footSpacing;
+        if (Physics.Raycast(bodyPosition, Vector3.down, out RaycastHit hit, raycastDistance, terrainLayer))
         {
             float distance = Vector3.Distance(leg.newPosition, hit.point);
 
-            // Update UI based on leg name
-            if (leg.name == "left")
-            {
-                leftLegDistanceText.text = $"Left Leg Distance: {distance:F2}"; // Update left leg UI
-            }
-            else if (leg.name == "right")
-            {
-                rightLegDistanceText.text = $"Right Leg Distance: {distance:F2}"; // Update right leg UI
-            }
 
             if (distance > stepDistance)
             {
                 leg.newPosition = hit.point + footOffset;
-                leg.lerp = 0;
+                leg.lerp = 0f; // reset lerp for new movement
             }
 
             if (leg.lerp < stepDuration)
             {
-                Vector3 tempPosition = Vector3.Lerp(leg.oldPosition, leg.newPosition, leg.lerp / stepDuration);
-                tempPosition.y += Mathf.Sin(leg.lerp / stepDuration * Mathf.PI) * stepHeight;
+                float t = leg.lerp / stepDuration;
+                Vector3 tempPosition = Vector3.Lerp(leg.oldPosition, leg.newPosition, t);
+                // Add vertical offset using a sine curve for the step arc
+                tempPosition.y += Mathf.Sin(t * Mathf.PI) * stepHeight;
 
                 leg.currentPosition = tempPosition;
                 leg.lerp += Time.deltaTime;
             }
             else
             {
+                // Movement complete
                 leg.oldPosition = leg.newPosition;
                 leg.isMoving = false;
-                leg.moveLeg = false;
+                leg.shouldMove = false;
 
-                int i = (leg.name == "left") ? 0 : 1;
-                circles[i].GetComponent<CircleRenderer>().DrawCircle(100, stepDistance, leg.transform.position);
+                if (circleRenderer != null)
+                {
+                    circleRenderer.DrawCircle(100, stepDistance, transform.position);
+                }
             }
         }
     }
 
+    private void UpdateStepDistanceUI(float distance)
+    {
+        // Only update UI if references are assigned
+        leftLegDistanceText.text = $"Distance: {distance:F2}";
+    }
+
+    private void UpdateCurrentLegUI()
+    {
+        if (currentLegText != null && legIndex >= 0 && legIndex < legs.Length)
+        {
+            currentLegText.text = $"Current Leg: {legs[legIndex].legType}";
+        }
+    }
+
+    private void DrawDebugRay()
+    {
+    }
+
     private void OnDrawGizmos()
     {
+        if (legs == null) return;
         foreach (Leg leg in legs)
         {
             Gizmos.color = Color.red;
