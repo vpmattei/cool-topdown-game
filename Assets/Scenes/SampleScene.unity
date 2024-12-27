@@ -141,7 +141,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &131292815
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -161,6 +161,7 @@ MonoBehaviour:
   moveDuration: 0.25
   stepHeight: 2
   legInterval: 0.125
+  currentLegIndex: 0
   legs:
   - {fileID: 2133888484}
   - {fileID: 211326310}
@@ -181,13 +182,13 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 2, z: 0}
-  m_LocalScale: {x: 2, y: 2, z: 2}
+  m_LocalScale: {x: 1.82848, y: 1.17968, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2133888488}
-  - {fileID: 211326309}
   - {fileID: 332148497}
   - {fileID: 226724077}
+  - {fileID: 211326309}
   - {fileID: 333940709}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -348,7 +349,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 131292814}
-  m_Mesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
+  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &211326308
 GameObject:
   m_ObjectHideFlags: 0
@@ -363,7 +364,7 @@ GameObject:
   - component: {fileID: 211326311}
   - component: {fileID: 211326310}
   m_Layer: 0
-  m_Name: Leg_R
+  m_Name: Leg_R2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -378,8 +379,8 @@ Transform:
   m_GameObject: {fileID: 211326308}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 1, y: -0.5, z: 0}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
+  m_LocalPosition: {x: 0.77343625, y: -1.331, z: -0.70710725}
+  m_LocalScale: {x: 0.16407071, y: 0.25430626, z: 0.15}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 131292816}
@@ -396,7 +397,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1b7683349b2534407967b849a9127cbe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  legName: right
+  legName: R2
   stepCurve:
     serializedVersion: 2
     m_Curve:
@@ -430,13 +431,16 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  body: {fileID: 481229406}
-  footOffset: {x: 1, y: 0.5, z: 0}
-  startMoveTime: 0
   terrainLayer:
     serializedVersion: 2
     m_Bits: 8
-  newPositionToMove: {fileID: 0}
+  body: {fileID: 131292814}
+  footOffset: {x: 1, y: 0.15, z: 0}
+  stepDistance: 2
+  moveDuration: 0.125
+  stepHeight: 2
+  legInterval: 0.125
+  legIndexToMove: 0
 --- !u!65 &211326311
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -525,7 +529,7 @@ GameObject:
   - component: {fileID: 226724074}
   - component: {fileID: 226724073}
   m_Layer: 0
-  m_Name: Leg_R (2)
+  m_Name: Leg_L2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -543,7 +547,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1b7683349b2534407967b849a9127cbe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  legName: right
+  legName: L2
   stepCurve:
     serializedVersion: 2
     m_Curve:
@@ -577,13 +581,16 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  body: {fileID: 481229406}
-  footOffset: {x: 0, y: 0.5, z: -1}
-  startMoveTime: 0
   terrainLayer:
     serializedVersion: 2
     m_Bits: 8
-  newPositionToMove: {fileID: 0}
+  body: {fileID: 131292814}
+  footOffset: {x: 0, y: 0.15, z: -1}
+  stepDistance: 2
+  moveDuration: 0.125
+  stepHeight: 2
+  legInterval: 0.125
+  legIndexToMove: 1
 --- !u!65 &226724074
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -667,8 +674,8 @@ Transform:
   m_GameObject: {fileID: 226724072}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.5, z: -1}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
+  m_LocalPosition: {x: -0.77343726, y: -1.331, z: -0.70710635}
+  m_LocalScale: {x: 0.16407071, y: 0.25430626, z: 0.15}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 131292816}
@@ -975,7 +982,7 @@ GameObject:
   - component: {fileID: 332148494}
   - component: {fileID: 332148493}
   m_Layer: 0
-  m_Name: Leg_R (1)
+  m_Name: Leg_R1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -993,7 +1000,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1b7683349b2534407967b849a9127cbe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  legName: right
+  legName: R1
   stepCurve:
     serializedVersion: 2
     m_Curve:
@@ -1027,13 +1034,16 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  body: {fileID: 481229406}
-  footOffset: {x: 0, y: 0.5, z: 1}
-  startMoveTime: 0
   terrainLayer:
     serializedVersion: 2
     m_Bits: 8
-  newPositionToMove: {fileID: 0}
+  body: {fileID: 131292814}
+  footOffset: {x: 0, y: 0.15, z: 1}
+  stepDistance: 2
+  moveDuration: 0.125
+  stepHeight: 2
+  legInterval: 0.125
+  legIndexToMove: 1
 --- !u!65 &332148494
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1117,8 +1127,8 @@ Transform:
   m_GameObject: {fileID: 332148492}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.5, z: 1}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
+  m_LocalPosition: {x: 0.77343726, y: -1.331, z: 0.70710635}
+  m_LocalScale: {x: 0.16407071, y: 0.25430626, z: 0.15}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 131292816}
@@ -1151,8 +1161,8 @@ Transform:
   m_GameObject: {fileID: 333940708}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.5, z: 0.5}
-  m_LocalScale: {x: 0.2, y: 0.2, z: 0.2}
+  m_LocalPosition: {x: 0, y: 0, z: 0.5}
+  m_LocalScale: {x: 0.4, y: 0.4, z: 0.8}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 131292816}
@@ -1571,37 +1581,6 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
---- !u!1 &481229406
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 481229407}
-  m_Layer: 0
-  m_Name: Body
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &481229407
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 481229406}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 2, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &503162867
 GameObject:
   m_ObjectHideFlags: 0
@@ -3831,13 +3810,16 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  body: {fileID: 1030121315}
-  footOffset: {x: 0, y: 0, z: 0}
-  startMoveTime: 0
   terrainLayer:
     serializedVersion: 2
     m_Bits: 8
-  newPositionToMove: {fileID: 0}
+  body: {fileID: 1030121315}
+  footOffset: {x: 0, y: 0, z: 0}
+  stepDistance: 2
+  moveDuration: 0.25
+  stepHeight: 2
+  legInterval: 0.125
+  legIndexToMove: 0
 --- !u!1 &1838748393 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 202844136719166697, guid: fda4b3987420a4b49a249311c7876550, type: 3}
@@ -4059,13 +4041,16 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  body: {fileID: 1030121315}
-  footOffset: {x: 0, y: 0, z: 0}
-  startMoveTime: 0
   terrainLayer:
     serializedVersion: 2
     m_Bits: 8
-  newPositionToMove: {fileID: 0}
+  body: {fileID: 1030121315}
+  footOffset: {x: 0, y: 0, z: 0}
+  stepDistance: 2
+  moveDuration: 0.25
+  stepHeight: 2
+  legInterval: 0.125
+  legIndexToMove: 0
 --- !u!1 &2133888483
 GameObject:
   m_ObjectHideFlags: 0
@@ -4080,7 +4065,7 @@ GameObject:
   - component: {fileID: 2133888485}
   - component: {fileID: 2133888484}
   m_Layer: 0
-  m_Name: Leg_L
+  m_Name: Leg_L1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4098,7 +4083,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1b7683349b2534407967b849a9127cbe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  legName: left
+  legName: L1
   stepCurve:
     serializedVersion: 2
     m_Curve:
@@ -4132,13 +4117,16 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  body: {fileID: 481229406}
-  footOffset: {x: -1, y: 0.5, z: 0}
-  startMoveTime: 0
   terrainLayer:
     serializedVersion: 2
     m_Bits: 8
-  newPositionToMove: {fileID: 0}
+  body: {fileID: 131292814}
+  footOffset: {x: 0, y: 0.15, z: 0}
+  stepDistance: 2
+  moveDuration: 0.125
+  stepHeight: 2
+  legInterval: 0.125
+  legIndexToMove: 0
 --- !u!65 &2133888485
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -4222,8 +4210,8 @@ Transform:
   m_GameObject: {fileID: 2133888483}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -1, y: -0.5, z: 0}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
+  m_LocalPosition: {x: -0.77343625, y: -1.331, z: 0.70710725}
+  m_LocalScale: {x: 0.16407071, y: 0.25430626, z: 0.15}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 131292816}
@@ -4383,6 +4371,7 @@ MonoBehaviour:
   moveDuration: 0.1
   stepHeight: 0.4
   legInterval: 0.05
+  currentLegIndex: 0
   legs:
   - {fileID: 2112414688}
   - {fileID: 1637659430}
@@ -4497,7 +4486,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8820507734426138652, guid: 26f7619e9146e4f29b1b2e55472b5a1e, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -4527,7 +4516,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 202844136719166697, guid: fda4b3987420a4b49a249311c7876550, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2688763891180326788, guid: fda4b3987420a4b49a249311c7876550, type: 3}
       propertyPath: m_LocalPosition.x
@@ -4598,4 +4587,3 @@ SceneRoots:
   - {fileID: 1022101208}
   - {fileID: 868513838}
   - {fileID: 131292816}
-  - {fileID: 481229407}

@@ -1,64 +1,120 @@
+using System;
 using UnityEngine;
 
 public class LegDebug : MonoBehaviour
 {
-    public string legName;
-    // [SerializeField] private float stepDuration = 0.25f;
-    // [SerializeField] private float stepHeight = 0.4f;
-    [SerializeField] private AnimationCurve stepCurve; // Define the curve in the inspector
+    #region Inspector Fields
 
+    [Header("Basic Leg Info")]
+    public string legName;
+    [SerializeField] private AnimationCurve stepCurve;
+    [SerializeField] private LayerMask terrainLayer;
+
+    [Header("References")]
     public GameObject body;
+    public Vector3 footOffset;
+
+    #endregion
+
+    #region Private Fields
+
     private Vector3 oldPosition;
     private Vector3 newPosition;
     private Vector3 currentPosition;
-    public Vector3 footOffset;
     private float moveTimer = 0f;
-    public float startMoveTime;
     private bool isMoving = false;
     private bool isDone = false;
     private int movesToPerform = 0;
 
+    private MoveLegDebugger moveLegDebugger;
+
+    #endregion
+
+    #region Movement Settings
+
+    [SerializeField] private float stepDistance = 2f;   // The threshold after which movement should start
+    [SerializeField] private float moveDuration = 0.25f; // How long each leg moves
+    [SerializeField] private float stepHeight = 2f;     // How high each leg goes
+    [SerializeField] private float legInterval = 0.125f; // Time interval between legs starting movement
+    [Tooltip("Leg index that indicates at which order this leg will move (0 is first, 1 is second and so on...)")]
+    [SerializeField] private int legIndexToMove = 0; // Leg index that indicates at which order this leg will move
+
+    #endregion
+
+    #region Events
+
+    /// <summary>
+    /// Fired when this leg finishes its movement.
+    /// The int parameter can be the legIndexToMove, 
+    /// or you can pass this script instance (LegDebug) if you prefer.
+    /// </summary>
+    public event Action<int> OnLegMovementFinished;
+
+    #endregion
+
+    #region Properties
+
+    // Readonly properties for external checks
     public string LegName => legName;
-    public Vector3 FootOffset => footOffset;
     public bool IsMoving => isMoving;
     public bool IsDone => isDone;
     public float MoveTimer => moveTimer;
+
+    // MovesToPerform as a standard property
     public int MovesToPerform
     {
-        set { movesToPerform = value; }
-        get { return movesToPerform; }
-    }
-    public float StartMoveTime
-    {
-        set { startMoveTime = value; }
-        get { return startMoveTime; }
+        get => movesToPerform;
+        set => movesToPerform = value;
     }
 
-    [SerializeField] private LayerMask terrainLayer;
+    // StartMoveTime can be a simple auto-property or standard property
+    public float StartMoveTime { get; set; }
 
-    // DEBUG
-    public GameObject newPositionToMove;
+    // Movement settings: public getters/setters
+    public float StepDistance { get => stepDistance; set => stepDistance = value; }
+
+    public float MoveDuration { get => moveDuration; set => moveDuration = value; }
+
+    public float StepHeight { get => stepHeight; set => stepHeight = value; }
+
+    public float LegInterval { get => legInterval; set => legInterval = value; }
+
+    public Vector3 FootOffset { get => footOffset; set => footOffset = value; }
+    public int LegIndexToMove => legIndexToMove; // read-only for external usage
+
+    #endregion
 
     void Start()
     {
         body = transform.parent.gameObject;
-        footOffset = transform.localPosition;
+        moveLegDebugger = body?.GetComponent<MoveLegDebugger>();
+        // footOffset = transform.localPosition;
         isMoving = false;
         isDone = false;
         moveTimer = 1f;
         if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, 30, terrainLayer))
         {
-            currentPosition = newPosition = oldPosition = hit.point + new Vector3(0, .5f, 0);
+            footOffset = currentPosition = newPosition = oldPosition = hit.point;
         }
     }
 
     void Update()
     {
-        Debug.DrawRay(transform.position + new Vector3(0, 0.5f, 0), Vector3.down * 10, Color.yellow);
-        // if (Physics.Raycast(transform.position + new Vector3(0, 0.5f, 0), Vector3.down, out RaycastHit hit, 10, terrainLayer))
-        // {
-        //     Gizmos.DrawSphere(hit.point, 2);
-        // }
+        if (Physics.Raycast(footOffset + body.transform.position + new Vector3(0, 0.5f, 0), Vector3.down, out RaycastHit newHit, 10, terrainLayer))
+        {
+            if (Physics.Raycast(oldPosition + new Vector3(0, 0.5f, 0), Vector3.down, out RaycastHit oldHit, 10, terrainLayer))
+            {
+                float distanceMoved = Vector3.Distance(oldHit.point, newHit.point);
+
+                if (distanceMoved >= stepDistance)
+                {
+                    if (legIndexToMove == moveLegDebugger.currentLegIndex)
+                    {
+                        MoveLeg(newHit.point, moveDuration, stepHeight);
+                    }
+                }
+            }
+        }
 
         transform.position = currentPosition;
     }
@@ -95,6 +151,11 @@ public class LegDebug : MonoBehaviour
             oldPosition = newPosition;
             isMoving = false;
             isDone = true;
+
+            // Fire the event so MoveLegDebugger knows this leg is done
+            OnLegMovementFinished?.Invoke(legIndexToMove);
+
+            // ResetLegState();
         }
     }
 
@@ -103,5 +164,19 @@ public class LegDebug : MonoBehaviour
         isMoving = false;
         isDone = false;
         moveTimer = 1f;  // Reset to what you consider as the "default" state
+    }
+
+    void OnDrawGizmos()
+    {
+        Debug.DrawRay(transform.position + new Vector3(0, 0.5f, 0), Vector3.down * 10, Color.yellow);
+
+        if (Physics.Raycast(footOffset + body.transform.position + new Vector3(0, 0.5f, 0), Vector3.down, out RaycastHit hitSphere, 10, terrainLayer))
+        {
+            Gizmos.DrawSphere(hitSphere.point, .2f);
+            if (Physics.Raycast(oldPosition + new Vector3(0, 0.5f, 0), Vector3.down, out RaycastHit hit, 10, terrainLayer))
+            {
+                Debug.DrawLine(hitSphere.point, hit.point, Color.red);
+            }
+        }
     }
 }

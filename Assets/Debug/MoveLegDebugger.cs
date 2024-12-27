@@ -10,6 +10,8 @@ public class MoveLegDebugger : MonoBehaviour
     [SerializeField] private float moveDuration = 2f;    // How long each leg moves
     [SerializeField] private float stepHeight = 4f;      // How high each leg goes
     [SerializeField] private float legInterval = 1f;     // Time interval between legs starting movement
+    public int currentLegIndex = 0;     // Current Leg index that indicates which leg(s) should move
+    private int maxLegIndex = 0;
 
     [Header("Legs")]
     [SerializeField] private List<LegDebug> legs = new List<LegDebug>();
@@ -42,105 +44,48 @@ public class MoveLegDebugger : MonoBehaviour
             currentBodyPosition = oldBodyPosition = hit.point;
         }
 
-        // Cache the CircleRenderer component
-        if (circleRendererObject != null)
+        // Subscribe to each leg's OnLegMovementFinished event
+        foreach (var leg in legs)
         {
-            circleRenderer = circleRendererObject.GetComponent<CircleRenderer>();
-        }
-        else
-        {
-            Debug.LogWarning("CircleRendererObject is not assigned.");
+            leg.OnLegMovementFinished += OnLegDoneMoving;
+
+            if (leg.LegIndexToMove > maxLegIndex) maxLegIndex = leg.LegIndexToMove;
         }
     }
 
-    private void Update()
+    /// <summary>
+    /// Called every time a leg finishes moving. The leg passes its own legIndex.
+    /// Once all legs of the "currentLegIndex" have moved, we can increment currentLegIndex.
+    /// </summary>
+    private void OnLegDoneMoving(int finishedLegIndex)
     {
-        Debug.DrawRay(transform.position + new Vector3(0, 0.5f, 0), Vector3.down * raycastDistance, Color.green);
-        if (Physics.Raycast(transform.position + new Vector3(0, 0.5f, 0), Vector3.down, out RaycastHit hit, raycastDistance, terrainLayer))
+        // If we only allow one leg at a time, we can just increment
+        // currentLegIndex after each completion:
+        // 
+        // currentLegIndex++;
+        //
+        // Or, if you have multiple legs with the same legIndex, 
+        // you can check if they're all done before incrementing.
+        // For example:
+
+        bool allLegsOfThisIndexDone = true;
+        foreach (var leg in legs)
         {
-            currentBodyPosition = hit.point;
-
-            distanceMoved = Vector3.Distance(oldBodyPosition, currentBodyPosition);
-
-            // Check if we should start moving legs
-            if (distanceMoved >= stepDistance && !shouldMove)
+            // If any leg has the same legIndexToMove as the leg that triggered 
+            // the event, but is not done, don't increment yet.
+            if (leg.LegIndexToMove == finishedLegIndex && !leg.IsDone)
             {
-                oldBodyPosition = currentBodyPosition;
-
-                circleRenderer.DrawCircle(100, stepDistance, oldBodyPosition + new Vector3(0, .5f, 0));
-
-                if (!shouldMove) movementStartTime = 0; // If this is the first move, then set the timer to 0
-                // distanceMoved = 0f; // Reset the distance
-
-                for (int i = 0; i < legs.Count; i++)
-                {
-                    shouldMove = true;
-
-                    var leg = legs[i];
-
-                    if (useSeparateStartTimes && i < separateStartTimes.Count)
-                    {
-                        leg.StartMoveTime = separateStartTimes[i];
-                    }
-                    else
-                    {
-                        leg.StartMoveTime = i * legInterval;
-                    }
-                    
-                    leg.MovesToPerform += 1;
-                }
+                allLegsOfThisIndexDone = false;
+                break;
             }
         }
 
-        if (shouldMove)
+        if (allLegsOfThisIndexDone && finishedLegIndex == currentLegIndex)
         {
-            UpdateLegMovements();
-        }
-    }
+            currentLegIndex++;
+            Debug.Log($"All legs with index {finishedLegIndex} are done. Incrementing currentLegIndex to {currentLegIndex}.");
 
-    private void UpdateLegMovements()
-    {
-        bool allLegsDone = true;
-
-        for (int i = 0; i < legs.Count; i++)
-        {
-            var leg = legs[i];
-
-            // Check if it's time for this leg to start moving
-            if (movementStartTime >= leg.StartMoveTime)
-            {
-                if (!leg.IsDone && leg.MovesToPerform > 0)
-                {
-                    leg.MoveLeg(currentBodyPosition + leg.FootOffset, moveDuration, stepHeight);
-                    allLegsDone = false;
-                }
-                else
-                {
-                    leg.ResetLegState();
-                    if (leg.MovesToPerform > 0)
-                    {
-                        leg.MovesToPerform -= 1;
-                    }
-                }
-            }
-        }
-
-        if (allLegsDone) ResetMovement();
-
-        movementStartTime += Time.deltaTime;
-    }
-
-    private void ResetMovement()
-    {
-        shouldMove = false;
-
-        // Reset each leg so it can move again next time
-        for (int i = 0; i < legs.Count; i++)
-        {
-            var leg = legs[i];
-            // Reset relevant fields
-            // You may need to adjust which states are reset based on your logic
-            leg.ResetLegState();
+            if (currentLegIndex > maxLegIndex) currentLegIndex = 0;
         }
     }
 
