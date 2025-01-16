@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
-public class MoveLegDebugger : MonoBehaviour
+public class ProceduralLegAnimation : MonoBehaviour
 {
     [Header("Terrain Settings")]
     [SerializeField] private LayerMask terrainLayer;
@@ -14,7 +14,7 @@ public class MoveLegDebugger : MonoBehaviour
     private int maxLegIndex = 0;
 
     [Header("Legs")]
-    [SerializeField] private List<LegDebug> legs = new List<LegDebug>();
+    [SerializeField] private List<Leg> legs = new List<Leg>();
 
     [Header("Separate Start Times")]
     [SerializeField] private bool useSeparateStartTimes = false;

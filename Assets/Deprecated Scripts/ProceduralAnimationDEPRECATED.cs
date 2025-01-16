@@ -1,7 +1,7 @@
 using TMPro;
 using UnityEngine;
 
-public class ProceduralAnimation : MonoBehaviour
+public class ProceduralAnimationDEPRECATED : MonoBehaviour
 {
     [Header("Settings")]
     [SerializeField] private LayerMask terrainLayer;
@@ -13,7 +13,7 @@ public class ProceduralAnimation : MonoBehaviour
     [SerializeField] private Vector3 footOffset = new Vector3(0, 0.1f, 0);
 
     [Header("Legs")]
-    [SerializeField] private Leg[] legs;
+    [SerializeField] private LegDEPRECATED[] legs;
 
     [Header("Visualizations")]
     [SerializeField] private GameObject circleRendererObject;
@@ -105,7 +105,7 @@ public class ProceduralAnimation : MonoBehaviour
         UpdateCurrentLegUI();
     }
 
-    private void MoveLeg(Leg leg)
+    private void MoveLeg(LegDEPRECATED leg)
     {
         leg.isMoving = true;
 
@@ -156,7 +156,7 @@ public class ProceduralAnimation : MonoBehaviour
     {
         if (currentLegText != null && legIndex >= 0 && legIndex < legs.Length)
         {
-            currentLegText.text = $"Current Leg: {legs[legIndex].legType}";
+            currentLegText.text = $"Current LegDEPRECATED: {legs[legIndex].legType}";
         }
     }
 
@@ -167,7 +167,7 @@ public class ProceduralAnimation : MonoBehaviour
     private void OnDrawGizmos()
     {
         if (legs == null) return;
-        foreach (Leg leg in legs)
+        foreach (LegDEPRECATED leg in legs)
         {
             Gizmos.color = Color.red;
             Gizmos.DrawSphere(leg.newPosition, 0.05f);

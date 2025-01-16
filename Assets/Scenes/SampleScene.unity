@@ -136,7 +136,7 @@ GameObject:
   - component: {fileID: 131292822}
   - component: {fileID: 131292821}
   m_Layer: 0
-  m_Name: MoveLegDebugger
+  m_Name: Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -155,13 +155,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   terrainLayer:
-    serializedVersion: 2
     m_Bits: 8
   stepDistance: 2
   moveDuration: 0.25
   stepHeight: 2
   legInterval: 0.125
   currentLegIndex: 0
+  maxLegIndex: 0
   legs:
   - {fileID: 2133888484}
   - {fileID: 211326310}
@@ -171,7 +171,12 @@ MonoBehaviour:
   separateStartTimes: []
   raycastDistance: 30
   circleRendererObject: {fileID: 1838748393}
+  circleRenderer: {fileID: 0}
   shouldMove: 0
+  movementStartTime: 0
+  currentBodyPosition: {x: 0, y: 0, z: 0}
+  oldBodyPosition: {x: 0, y: 0, z: 0}
+  distanceMoved: 0
 --- !u!4 &131292816
 Transform:
   m_ObjectHideFlags: 0
@@ -204,20 +209,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7f348de185a614a4c833064a0dff6645, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rgbody: {fileID: 0}
+  cam: {fileID: 0}
+  animator: {fileID: 0}
   walkSpeed: 5
   acceleration: 10
   deceleration: 40
   rotationSpeed: 10
   dashImpulseMagnitude: 30
+  targetSpeed: -1
+  moveDirection: {x: 0, y: 0, z: 0}
+  currentVelocity: {x: 0, y: 0, z: 0}
   jumpHeight: 20
   isGrounded: 1
   groundCheckDistance: 0.4
   rayGroundCheckStartPos: 0
   groundLayer:
-    serializedVersion: 2
     m_Bits: 8
   gravityForce: 60
   applyGravityForceThreshold: 19.5
+  isMoving: 0
 --- !u!95 &131292818
 Animator:
   serializedVersion: 7
@@ -285,12 +296,15 @@ MonoBehaviour:
   m_DeviceLostEvent:
     m_PersistentCalls:
       m_Calls: []
+    m_CallsDirty: 1
   m_DeviceRegainedEvent:
     m_PersistentCalls:
       m_Calls: []
+    m_CallsDirty: 1
   m_ControlsChangedEvent:
     m_PersistentCalls:
       m_Calls: []
+    m_CallsDirty: 1
   m_ActionEvents: []
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: Keyboard&Mouse
@@ -399,10 +413,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   legName: R2
   stepCurve:
-    serializedVersion: 2
     m_Curve:
-    - serializedVersion: 3
-      time: 0
+    - time: 0
       value: 0
       inSlope: 4.8480554
       outSlope: 4.8480554
@@ -410,8 +422,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0
       outWeight: 0.029910319
-    - serializedVersion: 3
-      time: 0.49999917
+    - time: 0.49999917
       value: 0.99999857
       inSlope: 0.011593358
       outSlope: 0.011593358
@@ -419,8 +430,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.23624535
-    - serializedVersion: 3
-      time: 1
+    - time: 1
       value: 0
       inSlope: -4.615209
       outSlope: -4.615209
@@ -432,15 +442,28 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   terrainLayer:
-    serializedVersion: 2
     m_Bits: 8
   body: {fileID: 131292814}
   footOffset: {x: 1, y: 0.15, z: 0}
+  oldPosition: {x: 0, y: 0, z: 0}
+  newPosition: {x: 0, y: 0, z: 0}
+  currentPosition: {x: 0, y: 0, z: 0}
+  moveTimer: 0
+  isMoving: 0
+  isDone: 0
+  movesToPerform: 0
+  currentRotation: 0
+  rotationAmount: 0
+  proceduralLegAnimation: {fileID: 0}
+  playerController: {fileID: 0}
   stepDistance: 2
-  moveDuration: 0.125
+  rotationAngle: 15
+  velocityFactor: 0
+  moveDuration: 0.25
   stepHeight: 2
   legInterval: 0.125
   legIndexToMove: 0
+  <StartMoveTime>k__BackingField: 0
 --- !u!65 &211326311
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -549,10 +572,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   legName: L2
   stepCurve:
-    serializedVersion: 2
     m_Curve:
-    - serializedVersion: 3
-      time: 0
+    - time: 0
       value: 0
       inSlope: 4.8480554
       outSlope: 4.8480554
@@ -560,8 +581,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0
       outWeight: 0.029910319
-    - serializedVersion: 3
-      time: 0.49999917
+    - time: 0.49999917
       value: 0.99999857
       inSlope: 0.011593358
       outSlope: 0.011593358
@@ -569,8 +589,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.23624535
-    - serializedVersion: 3
-      time: 1
+    - time: 1
       value: 0
       inSlope: -4.615209
       outSlope: -4.615209
@@ -582,15 +601,28 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   terrainLayer:
-    serializedVersion: 2
     m_Bits: 8
   body: {fileID: 131292814}
   footOffset: {x: 0, y: 0.15, z: -1}
+  oldPosition: {x: 0, y: 0, z: 0}
+  newPosition: {x: 0, y: 0, z: 0}
+  currentPosition: {x: 0, y: 0, z: 0}
+  moveTimer: 0
+  isMoving: 0
+  isDone: 0
+  movesToPerform: 0
+  currentRotation: 0
+  rotationAmount: 0
+  proceduralLegAnimation: {fileID: 0}
+  playerController: {fileID: 0}
   stepDistance: 2
-  moveDuration: 0.125
+  rotationAngle: 15
+  velocityFactor: 0
+  moveDuration: 0.25
   stepHeight: 2
   legInterval: 0.125
   legIndexToMove: 1
+  <StartMoveTime>k__BackingField: 0
 --- !u!65 &226724074
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -730,84 +762,323 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color:
+    r: 1
+    g: 1
+    b: 1
+    a: 1
   m_RaycastTarget: 1
+  m_RaycastTargetCache: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  <useLegacyMeshGeneration>k__BackingField: 1
   m_Maskable: 1
+  m_IsMaskingGraphic: 0
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
+    m_CallsDirty: 1
   m_text: Current Leg
+  m_IsTextBackingStringDirty: 0
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_currentFontAsset: {fileID: 0}
+  m_isSDFShader: 0
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_currentMaterial: {fileID: 0}
+  m_currentMaterialIndex: 0
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
+  m_isMaterialDirty: 0
   m_fontColor32:
-    serializedVersion: 2
     rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+  m_fontColor:
+    r: 1
+    g: 1
+    b: 1
+    a: 1
+  m_underlineColor:
+    rgba: 4294967295
+  m_strikethroughColor:
+    rgba: 4294967295
+  m_ConvertToLinearSpace: 0
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
-    topLeft: {r: 1, g: 1, b: 1, a: 1}
-    topRight: {r: 1, g: 1, b: 1, a: 1}
-    bottomLeft: {r: 1, g: 1, b: 1, a: 1}
-    bottomRight: {r: 1, g: 1, b: 1, a: 1}
+    topLeft:
+      r: 1
+      g: 1
+      b: 1
+      a: 1
+    topRight:
+      r: 1
+      g: 1
+      b: 1
+      a: 1
+    bottomLeft:
+      r: 1
+      g: 1
+      b: 1
+      a: 1
+    bottomRight:
+      r: 1
+      g: 1
+      b: 1
+      a: 1
   m_fontColorGradientPreset: {fileID: 0}
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
+  m_tintSprite: 0
+  m_spriteColor:
+    rgba: 0
   m_StyleSheet: {fileID: 0}
+  m_TextStyle:
+    m_Name: 
+    m_HashCode: 0
+    m_OpeningDefinition: 
+    m_ClosingDefinition: 
+    m_OpeningTagArray: []
+    m_ClosingTagArray: []
   m_TextStyleHashCode: -1183493901
   m_overrideHtmlColors: 0
   m_faceColor:
-    serializedVersion: 2
     rgba: 4294967295
+  m_outlineColor:
+    rgba: 4278190080
+  m_outlineWidth: 0
+  m_currentEnvMapRotation: {x: 0, y: 0, z: 0}
+  m_hasEnvMapProperty: 0
   m_fontSize: 28
+  m_currentFontSize: 0
   m_fontSizeBase: 28
   m_fontWeight: 400
+  m_FontWeightInternal: 400
   m_enableAutoSizing: 0
+  m_maxFontSize: 0
+  m_minFontSize: 0
+  m_AutoSizeIterationCount: 0
+  m_AutoSizeMaxIterationCount: 100
+  m_IsAutoSizePointSizeSet: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
+  m_FontStyleInternal: 0
+  m_isUsingBold: 0
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 256
   m_textAlignment: 65535
+  m_lineJustification: 0
+  m_textContainerLocalCorners:
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
   m_characterSpacing: 0
+  m_cSpacing: 0
+  m_monoSpacing: 0
+  m_duoSpace: 0
   m_wordSpacing: 0
   m_lineSpacing: 0
+  m_lineSpacingDelta: 0
+  m_lineHeight: -32767
+  m_IsDrivenLineSpacing: 0
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
+  m_charWidthAdjDelta: 0
   m_TextWrappingMode: 1
+  m_isCharacterWrappingEnabled: 0
+  m_isNonBreakingSpace: 0
+  m_isIgnoringAlignment: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
+  m_firstOverflowCharacterIndex: -1
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
+  m_isTextTruncated: 0
   m_enableKerning: 0
-  m_ActiveFontFeatures: 6e72656b
+  m_LastBaseGlyphIndex: 0
+  m_ActiveFontFeatures:
+  - 1801810542
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
   m_EmojiFallbackSupport: 1
   m_parseCtrlCharacters: 1
+  m_isOverlay: 0
   m_isOrthographic: 1
   m_isCullingEnabled: 0
+  m_isMaskingEnabled: 0
+  isMaskUpdateRequired: 0
+  m_ignoreCulling: 1
   m_horizontalMapping: 0
   m_verticalMapping: 0
   m_uvLineOffset: 0
+  m_renderMode: 255
   m_geometrySortingOrder: 0
   m_IsTextObjectScaleStatic: 0
   m_VertexBufferAutoSizeReduction: 0
+  m_firstVisibleCharacter: 0
+  m_maxVisibleCharacters: 99999
+  m_maxVisibleWords: 99999
+  m_maxVisibleLines: 99999
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
+  m_isNewPage: 0
   m_margin: {x: 0, y: 0, z: -168.50201, w: 0}
+  m_marginLeft: 0
+  m_marginRight: 0
+  m_marginWidth: 0
+  m_marginHeight: 0
+  m_width: -1
+  m_textInfo: {textComponent: {fileID: 0}, characterCount: 0, spriteCount: 0, spaceCount: 0, wordCount: 0, linkCount: 0, lineCount: 0, pageCount: 0, materialCount: 0}
+  m_havePropertiesChanged: 0
   m_isUsingLegacyAnimationComponent: 0
+  m_transform: {fileID: 0}
+  m_rectTransform: {fileID: 0}
+  m_PreviousRectTransformSize: {x: 0, y: 0}
+  m_PreviousPivotPosition: {x: 0, y: 0}
+  <autoSizeTextContainer>k__BackingField: 0
+  m_autoSizeTextContainer: 0
+  m_mesh: {fileID: 0}
   m_isVolumetricText: 0
+  m_spriteAnimator: {fileID: 0}
+  m_flexibleHeight: -1
+  m_flexibleWidth: -1
+  m_minWidth: 0
+  m_minHeight: 0
+  m_maxWidth: 0
+  m_maxHeight: 0
+  m_LayoutElement: {fileID: 0}
+  m_preferredWidth: 0
+  m_RenderedWidth: 0
+  m_isPreferredWidthDirty: 0
+  m_preferredHeight: 0
+  m_RenderedHeight: 0
+  m_isPreferredHeightDirty: 0
+  m_isCalculatingPreferredValues: 0
+  m_layoutPriority: 0
+  m_isLayoutDirty: 0
+  m_isAwake: 0
+  m_isWaitingOnResourceLoad: 0
+  m_inputSource: 0
+  m_fontScaleMultiplier: 0
+  tag_LineIndent: 0
+  tag_Indent: 0
+  tag_NoParsing: 0
+  m_isTextLayoutPhase: 0
+  m_FXRotation: {x: 0, y: 0, z: 0, w: 0}
+  m_FXScale: {x: 0, y: 0, z: 0}
+  m_InternalTextProcessingArraySize: 0
+  m_totalCharacterCount: 0
+  m_characterCount: 0
+  m_firstCharacterOfLine: 0
+  m_firstVisibleCharacterOfLine: 0
+  m_lastCharacterOfLine: 0
+  m_lastVisibleCharacterOfLine: 0
+  m_lineNumber: 0
+  m_lineVisibleCharacterCount: 0
+  m_lineVisibleSpaceCount: 0
+  m_pageNumber: 0
+  m_PageAscender: 0
+  m_maxTextAscender: 0
+  m_maxCapHeight: 0
+  m_ElementAscender: 0
+  m_ElementDescender: 0
+  m_maxLineAscender: 0
+  m_maxLineDescender: 0
+  m_startOfLineAscender: 0
+  m_startOfLineDescender: 0
+  m_lineOffset: 0
+  m_htmlColor:
+    rgba: 4294967295
+  m_colorGradientPreset: {fileID: 0}
+  m_colorGradientPresetIsTinted: 0
+  m_tabSpacing: 0
+  m_spacing: 0
+  m_TextStyleStackDepth: 0
+  m_ItalicAngle: 0
+  m_padding: 0
+  m_baselineOffset: 0
+  m_xAdvance: 0
+  m_textElementType: 0
+  m_cached_TextElement:
+    m_ElementType: 0
+    m_Unicode: 0
+    m_TextAsset: {fileID: 0}
+    m_Glyph:
+      m_Index: 0
+      m_Metrics:
+        m_Width: 0
+        m_Height: 0
+        m_HorizontalBearingX: 0
+        m_HorizontalBearingY: 0
+        m_HorizontalAdvance: 0
+      m_GlyphRect:
+        m_X: 0
+        m_Y: 0
+        m_Width: 0
+        m_Height: 0
+      m_Scale: 1
+      m_AtlasIndex: 0
+      m_ClassDefinitionType: 0
+    m_GlyphIndex: 0
+    m_Scale: 0
+  m_defaultSpriteAsset: {fileID: 0}
+  m_currentSpriteAsset: {fileID: 0}
+  m_spriteCount: 0
+  m_spriteIndex: 0
+  m_spriteAnimationID: 0
+  m_ignoreActiveState: 0
+  m_isRebuildingLayout: 0
+  m_ShouldUpdateCulling: 0
+  m_ClipRect:
+    x: 0
+    y: 0
+    width: 0
+    height: 0
+  m_ValidRect: 0
   m_hasFontAssetChanged: 0
+  m_subTextObjects:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  m_previousLossyScaleY: -1
+  m_RectTransformCorners:
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  m_canvasRenderer: {fileID: 0}
+  m_canvas: {fileID: 0}
+  m_CanvasScaleFactor: 0
+  m_isFirstAllocation: 0
+  m_max_characters: 8
   m_baseMaterial: {fileID: 0}
+  m_isScrollRegionSet: 0
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+  m_EnvMapMatrix:
+    e00: 0
+    e01: 0
+    e02: 0
+    e03: 0
+    e10: 0
+    e11: 0
+    e12: 0
+    e13: 0
+    e20: 0
+    e21: 0
+    e22: 0
+    e23: 0
+    e30: 0
+    e31: 0
+    e32: 0
+    e33: 0
 --- !u!222 &248134749
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -929,7 +1200,6 @@ MonoBehaviour:
   m_Cameras: []
   m_RendererIndex: -1
   m_VolumeLayerMask:
-    serializedVersion: 2
     m_Bits: 1
   m_VolumeTrigger: {fileID: 0}
   m_VolumeFrameworkUpdateModeOption: 2
@@ -968,6 +1238,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   focus: {fileID: 131292816}
   smoothTime: 2
+  offset: {x: 0, y: 0, z: 0}
 --- !u!1 &332148492
 GameObject:
   m_ObjectHideFlags: 0
@@ -1002,10 +1273,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   legName: R1
   stepCurve:
-    serializedVersion: 2
     m_Curve:
-    - serializedVersion: 3
-      time: 0
+    - time: 0
       value: 0
       inSlope: 4.8480554
       outSlope: 4.8480554
@@ -1013,8 +1282,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0
       outWeight: 0.029910319
-    - serializedVersion: 3
-      time: 0.49999917
+    - time: 0.49999917
       value: 0.99999857
       inSlope: 0.011593358
       outSlope: 0.011593358
@@ -1022,8 +1290,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.23624535
-    - serializedVersion: 3
-      time: 1
+    - time: 1
       value: 0
       inSlope: -4.615209
       outSlope: -4.615209
@@ -1035,15 +1302,28 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   terrainLayer:
-    serializedVersion: 2
     m_Bits: 8
   body: {fileID: 131292814}
   footOffset: {x: 0, y: 0.15, z: 1}
+  oldPosition: {x: 0, y: 0, z: 0}
+  newPosition: {x: 0, y: 0, z: 0}
+  currentPosition: {x: 0, y: 0, z: 0}
+  moveTimer: 0
+  isMoving: 0
+  isDone: 0
+  movesToPerform: 0
+  currentRotation: 0
+  rotationAmount: 0
+  proceduralLegAnimation: {fileID: 0}
+  playerController: {fileID: 0}
   stepDistance: 2
-  moveDuration: 0.125
+  rotationAngle: 15
+  velocityFactor: 0
+  moveDuration: 0.25
   stepHeight: 2
   legInterval: 0.125
   legIndexToMove: 1
+  <StartMoveTime>k__BackingField: 0
 --- !u!65 &332148494
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1471,12 +1751,15 @@ MonoBehaviour:
   m_DeviceLostEvent:
     m_PersistentCalls:
       m_Calls: []
+    m_CallsDirty: 1
   m_DeviceRegainedEvent:
     m_PersistentCalls:
       m_Calls: []
+    m_CallsDirty: 1
   m_ControlsChangedEvent:
     m_PersistentCalls:
       m_Calls: []
+    m_CallsDirty: 1
   m_ActionEvents: []
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: Keyboard&Mouse
@@ -1495,20 +1778,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7f348de185a614a4c833064a0dff6645, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rgbody: {fileID: 0}
+  cam: {fileID: 0}
+  animator: {fileID: 0}
   walkSpeed: 7
   acceleration: 20
   deceleration: 20
   rotationSpeed: 10
   dashImpulseMagnitude: 10
+  targetSpeed: -1
+  moveDirection: {x: 0, y: 0, z: 0}
+  currentVelocity: {x: 0, y: 0, z: 0}
   jumpHeight: 10
   isGrounded: 1
   groundCheckDistance: 0.5
   rayGroundCheckStartPos: 0
   groundLayer:
-    serializedVersion: 2
     m_Bits: 8
   gravityForce: 60
   applyGravityForceThreshold: 10
+  isMoving: 0
 --- !u!95 &471388068
 Animator:
   serializedVersion: 7
@@ -1619,10 +1908,8 @@ MonoBehaviour:
   anticipationRatio: 0
   target: {fileID: 471388061}
   m_FunctionCurve:
-    serializedVersion: 2
     m_Curve:
-    - serializedVersion: 3
-      time: 0
+    - time: 0
       value: 0
       inSlope: 1.5791368
       outSlope: 1.5791368
@@ -1630,8 +1917,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.01
+    - time: 0.01
       value: 0.015791368
       inSlope: 2.1577969
       outSlope: 2.1577969
@@ -1639,8 +1925,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.02
+    - time: 0.02
       value: 0.043155935
       inSlope: 3.1480775
       outSlope: 3.1480775
@@ -1648,8 +1933,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.03
+    - time: 0.03
       value: 0.07875291
       inSlope: 3.8397608
       outSlope: 3.8397608
@@ -1657,8 +1941,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.04
+    - time: 0.04
       value: 0.119951144
       inSlope: 4.29697
       outSlope: 4.29697
@@ -1666,8 +1949,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.049999997
+    - time: 0.049999997
       value: 0.1646923
       inSlope: 4.571414
       outSlope: 4.571414
@@ -1675,8 +1957,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.06
+    - time: 0.06
       value: 0.21137942
       inSlope: 4.7046943
       outSlope: 4.7046943
@@ -1684,8 +1965,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.07
+    - time: 0.07
       value: 0.2587862
       inSlope: 4.7301855
       outSlope: 4.7301855
@@ -1693,8 +1973,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.08
+    - time: 0.08
       value: 0.30598313
       inSlope: 4.6745744
       outSlope: 4.6745744
@@ -1702,8 +1981,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.089999996
+    - time: 0.089999996
       value: 0.35227767
       inSlope: 4.5591216
       outSlope: 4.5591216
@@ -1711,8 +1989,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.099999994
+    - time: 0.099999994
       value: 0.39716554
       inSlope: 4.4006877
       outSlope: 4.4006877
@@ -1720,8 +1997,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.11
+    - time: 0.11
       value: 0.44029143
       inSlope: 4.2125816
       outSlope: 4.2125816
@@ -1729,8 +2005,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.12
+    - time: 0.12
       value: 0.48141718
       inSlope: 4.005232
       outSlope: 4.005232
@@ -1738,8 +2013,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.13
+    - time: 0.13
       value: 0.52039605
       inSlope: 3.7867422
       outSlope: 3.7867422
@@ -1747,8 +2021,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.14
+    - time: 0.14
       value: 0.55715203
       inSlope: 3.563369
       outSlope: 3.563369
@@ -1756,8 +2029,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.14999999
+    - time: 0.14999999
       value: 0.5916634
       inSlope: 3.3398666
       outSlope: 3.3398666
@@ -1765,8 +2037,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.16
+    - time: 0.16
       value: 0.62394935
       inSlope: 3.119792
       outSlope: 3.119792
@@ -1774,8 +2045,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.17
+    - time: 0.17
       value: 0.6540593
       inSlope: 2.9057655
       outSlope: 2.9057655
@@ -1783,8 +2053,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.17999999
+    - time: 0.17999999
       value: 0.68206465
       inSlope: 2.699644
       outSlope: 2.699644
@@ -1792,8 +2061,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.19
+    - time: 0.19
       value: 0.70805216
       inSlope: 2.502695
       outSlope: 2.502695
@@ -1801,8 +2069,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.19999999
+    - time: 0.19999999
       value: 0.73211855
       inSlope: 2.3157215
       outSlope: 2.3157215
@@ -1810,8 +2077,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.21
+    - time: 0.21
       value: 0.7543666
       inSlope: 2.1391706
       outSlope: 2.1391706
@@ -1819,8 +2085,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.22
+    - time: 0.22
       value: 0.774902
       inSlope: 1.9732151
       outSlope: 1.9732151
@@ -1828,8 +2093,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.22999999
+    - time: 0.22999999
       value: 0.7938309
       inSlope: 1.817805
       outSlope: 1.817805
@@ -1837,8 +2101,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.24
+    - time: 0.24
       value: 0.8112581
       inSlope: 1.6727498
       outSlope: 1.6727498
@@ -1846,8 +2109,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.25
+    - time: 0.25
       value: 0.8272859
       inSlope: 1.5377376
       outSlope: 1.5377376
@@ -1855,8 +2117,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.26
+    - time: 0.26
       value: 0.8420128
       inSlope: 1.4123721
       outSlope: 1.4123721
@@ -1864,8 +2125,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.26999998
+    - time: 0.26999998
       value: 0.8555333
       inSlope: 1.2962097
       outSlope: 1.2962097
@@ -1873,8 +2133,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.28
+    - time: 0.28
       value: 0.867937
       inSlope: 1.1887752
       outSlope: 1.1887752
@@ -1882,8 +2141,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.29
+    - time: 0.29
       value: 0.8793088
       inSlope: 1.0895739
       outSlope: 1.0895739
@@ -1891,8 +2149,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.29999998
+    - time: 0.29999998
       value: 0.8897285
       inSlope: 0.9980942
       outSlope: 0.9980942
@@ -1900,8 +2157,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.31
+    - time: 0.31
       value: 0.8992707
       inSlope: 0.913843
       outSlope: 0.913843
@@ -1909,8 +2165,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.32
+    - time: 0.32
       value: 0.90800536
       inSlope: 0.8363404
       outSlope: 0.8363404
@@ -1918,8 +2173,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.32999998
+    - time: 0.32999998
       value: 0.9159975
       inSlope: 0.7651057
       outSlope: 0.7651057
@@ -1927,8 +2181,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.34
+    - time: 0.34
       value: 0.9233075
       inSlope: 0.69969255
       outSlope: 0.69969255
@@ -1936,8 +2189,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.35
+    - time: 0.35
       value: 0.92999136
       inSlope: 0.63967466
       outSlope: 0.63967466
@@ -1945,8 +2197,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.35999998
+    - time: 0.35999998
       value: 0.93610096
       inSlope: 0.5846349
       outSlope: 0.5846349
@@ -1954,8 +2205,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.37
+    - time: 0.37
       value: 0.94168407
       inSlope: 0.53419435
       outSlope: 0.53419435
@@ -1963,8 +2213,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.38
+    - time: 0.38
       value: 0.94678485
       inSlope: 0.4879986
       outSlope: 0.4879986
@@ -1972,8 +2221,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.39
+    - time: 0.39
       value: 0.95144403
       inSlope: 0.44570607
       outSlope: 0.44570607
@@ -1981,8 +2229,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.39999998
+    - time: 0.39999998
       value: 0.95569897
       inSlope: 0.40700418
       outSlope: 0.40700418
@@ -1990,8 +2237,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.41
+    - time: 0.41
       value: 0.9595841
       inSlope: 0.37160492
       outSlope: 0.37160492
@@ -1999,8 +2245,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.42
+    - time: 0.42
       value: 0.96313107
       inSlope: 0.33923417
       outSlope: 0.33923417
@@ -2008,8 +2253,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.42999998
+    - time: 0.42999998
       value: 0.9663688
       inSlope: 0.30964002
       outSlope: 0.30964002
@@ -2017,8 +2261,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.44
+    - time: 0.44
       value: 0.9693239
       inSlope: 0.28259438
       outSlope: 0.28259438
@@ -2026,8 +2269,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.45
+    - time: 0.45
       value: 0.9720207
       inSlope: 0.2578827
       outSlope: 0.2578827
@@ -2035,8 +2277,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.45999998
+    - time: 0.45999998
       value: 0.9744815
       inSlope: 0.23531008
       outSlope: 0.23531008
@@ -2044,8 +2285,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.47
+    - time: 0.47
       value: 0.9767269
       inSlope: 0.2146958
       outSlope: 0.2146958
@@ -2053,8 +2293,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.48
+    - time: 0.48
       value: 0.97877544
       inSlope: 0.19586998
       outSlope: 0.19586998
@@ -2062,8 +2301,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.48999998
+    - time: 0.48999998
       value: 0.9806443
       inSlope: 0.17868271
       outSlope: 0.17868271
@@ -2071,8 +2309,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.5
+    - time: 0.5
       value: 0.9823491
       inSlope: 0.16299477
       outSlope: 0.16299477
@@ -2080,8 +2317,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.51
+    - time: 0.51
       value: 0.9839042
       inSlope: 0.148675
       outSlope: 0.148675
@@ -2089,8 +2325,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.52
+    - time: 0.52
       value: 0.9853226
       inSlope: 0.13560665
       outSlope: 0.13560665
@@ -2098,8 +2333,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.53
+    - time: 0.53
       value: 0.9866163
       inSlope: 0.12368274
       outSlope: 0.12368274
@@ -2107,8 +2341,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.53999996
+    - time: 0.53999996
       value: 0.98779625
       inSlope: 0.11280158
       outSlope: 0.11280158
@@ -2116,8 +2349,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.55
+    - time: 0.55
       value: 0.98887235
       inSlope: 0.10287143
       outSlope: 0.10287143
@@ -2125,8 +2357,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.56
+    - time: 0.56
       value: 0.9898537
       inSlope: 0.09381482
       outSlope: 0.09381482
@@ -2134,8 +2365,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.57
+    - time: 0.57
       value: 0.99074864
       inSlope: 0.0855536
       outSlope: 0.0855536
@@ -2143,8 +2373,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.58
+    - time: 0.58
       value: 0.99156475
       inSlope: 0.078016594
       outSlope: 0.078016594
@@ -2152,8 +2381,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.59
+    - time: 0.59
       value: 0.992309
       inSlope: 0.0711412
       outSlope: 0.0711412
@@ -2161,8 +2389,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.59999996
+    - time: 0.59999996
       value: 0.9929876
       inSlope: 0.064870596
       outSlope: 0.064870596
@@ -2170,8 +2397,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.61
+    - time: 0.61
       value: 0.9936064
       inSlope: 0.059151523
       outSlope: 0.059151523
@@ -2179,8 +2405,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.62
+    - time: 0.62
       value: 0.9941706
       inSlope: 0.053936295
       outSlope: 0.053936295
@@ -2188,8 +2413,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.63
+    - time: 0.63
       value: 0.9946851
       inSlope: 0.049179837
       outSlope: 0.049179837
@@ -2197,8 +2421,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.64
+    - time: 0.64
       value: 0.9951542
       inSlope: 0.04484062
       outSlope: 0.04484062
@@ -2206,8 +2429,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.65
+    - time: 0.65
       value: 0.9955819
       inSlope: 0.040885843
       outSlope: 0.040885843
@@ -2215,8 +2437,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.65999997
+    - time: 0.65999997
       value: 0.9959719
       inSlope: 0.037279762
       outSlope: 0.037279762
@@ -2224,8 +2445,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.66999996
+    - time: 0.66999996
       value: 0.9963275
       inSlope: 0.03398948
       outSlope: 0.03398948
@@ -2233,8 +2453,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.68
+    - time: 0.68
       value: 0.9966517
       inSlope: 0.030988388
       outSlope: 0.030988388
@@ -2242,8 +2461,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.69
+    - time: 0.69
       value: 0.9969473
       inSlope: 0.028255608
       outSlope: 0.028255608
@@ -2251,8 +2469,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.7
+    - time: 0.7
       value: 0.9972168
       inSlope: 0.025764134
       outSlope: 0.025764134
@@ -2260,8 +2477,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.71
+    - time: 0.71
       value: 0.9974626
       inSlope: 0.023490213
       outSlope: 0.023490213
@@ -2269,8 +2485,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.71999997
+    - time: 0.71999997
       value: 0.9976866
       inSlope: 0.021415967
       outSlope: 0.021415967
@@ -2278,8 +2493,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.72999996
+    - time: 0.72999996
       value: 0.9978909
       inSlope: 0.019523464
       outSlope: 0.019523464
@@ -2287,8 +2501,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.74
+    - time: 0.74
       value: 0.9980771
       inSlope: 0.01780089
       outSlope: 0.01780089
@@ -2296,8 +2509,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.75
+    - time: 0.75
       value: 0.9982469
       inSlope: 0.01623036
       outSlope: 0.01623036
@@ -2305,8 +2517,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.76
+    - time: 0.76
       value: 0.9984017
       inSlope: 0.014796867
       outSlope: 0.014796867
@@ -2314,8 +2525,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.77
+    - time: 0.77
       value: 0.99854285
       inSlope: 0.013491524
       outSlope: 0.013491524
@@ -2323,8 +2533,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.78
+    - time: 0.78
       value: 0.99867153
       inSlope: 0.01229943
       outSlope: 0.01229943
@@ -2332,8 +2541,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.78999996
+    - time: 0.78999996
       value: 0.99878883
       inSlope: 0.011211645
       outSlope: 0.011211645
@@ -2341,8 +2549,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.79999995
+    - time: 0.79999995
       value: 0.99889576
       inSlope: 0.010222178
       outSlope: 0.010222178
@@ -2350,8 +2557,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.81
+    - time: 0.81
       value: 0.9989933
       inSlope: 0.009322146
       outSlope: 0.009322146
@@ -2359,8 +2565,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.82
+    - time: 0.82
       value: 0.9990822
       inSlope: 0.00849963
       outSlope: 0.00849963
@@ -2368,8 +2573,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.83
+    - time: 0.83
       value: 0.99916327
       inSlope: 0.0077486113
       outSlope: 0.0077486113
@@ -2377,8 +2581,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.84
+    - time: 0.84
       value: 0.9992372
       inSlope: 0.007063157
       outSlope: 0.007063157
@@ -2386,8 +2589,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.84999996
+    - time: 0.84999996
       value: 0.99930453
       inSlope: 0.006437308
       outSlope: 0.006437308
@@ -2395,8 +2597,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.85999995
+    - time: 0.85999995
       value: 0.9993659
       inSlope: 0.005868066
       outSlope: 0.005868066
@@ -2404,8 +2605,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.87
+    - time: 0.87
       value: 0.9994219
       inSlope: 0.0053524855
       outSlope: 0.0053524855
@@ -2413,8 +2613,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.88
+    - time: 0.88
       value: 0.999473
       inSlope: 0.004881625
       outSlope: 0.004881625
@@ -2422,8 +2621,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.89
+    - time: 0.89
       value: 0.9995195
       inSlope: 0.0044494914
       outSlope: 0.0044494914
@@ -2431,8 +2629,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.9
+    - time: 0.9
       value: 0.99956197
       inSlope: 0.0040561
       outSlope: 0.0040561
@@ -2440,8 +2637,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.90999997
+    - time: 0.90999997
       value: 0.99960065
       inSlope: 0.0036984717
       outSlope: 0.0036984717
@@ -2449,8 +2645,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.91999996
+    - time: 0.91999996
       value: 0.99963593
       inSlope: 0.0033706361
       outSlope: 0.0033706361
@@ -2458,8 +2653,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.93
+    - time: 0.93
       value: 0.99966806
       inSlope: 0.003072613
       outSlope: 0.003072613
@@ -2467,8 +2661,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.94
+    - time: 0.94
       value: 0.9996974
       inSlope: 0.002801421
       outSlope: 0.002801421
@@ -2476,8 +2669,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.95
+    - time: 0.95
       value: 0.9997241
       inSlope: 0.0025540614
       outSlope: 0.0025540614
@@ -2485,8 +2677,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.96
+    - time: 0.96
       value: 0.99974847
       inSlope: 0.002330544
       outSlope: 0.002330544
@@ -2494,8 +2685,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.96999997
+    - time: 0.96999997
       value: 0.9997707
       inSlope: 0.0021249074
       outSlope: 0.0021249074
@@ -2503,8 +2693,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.97999996
+    - time: 0.97999996
       value: 0.99979097
       inSlope: 0.0019371528
       outSlope: 0.0019371528
@@ -2512,8 +2701,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.98999995
+    - time: 0.98999995
       value: 0.99980944
       inSlope: 0.0018477457
       outSlope: 0.0018477457
@@ -2524,11 +2712,19 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  targetCurrentPos: {x: 0, y: 0, z: 0}
+  targetPreviousPos: {x: 0, y: 0, z: 0}
+  targetVelocity: {x: 0, y: 0, z: 0}
   targetCurrentRot: {x: 0, y: 0, z: 0, w: 0}
   targetPreviousRot: {x: 0, y: 0, z: 0, w: 0}
   targetAngVelocity: {x: 0, y: 0, z: 0}
+  pos: {x: 0, y: 0, z: 0}
+  vel: {x: 0, y: 0, z: 0}
   rot: {x: 0, y: 0, z: 0, w: 0}
   angVel: {x: 0, y: 0, z: 0}
+  k1: 0
+  k2: 0
+  k3: 0
 --- !u!23 &503162870
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -2732,15 +2928,19 @@ MonoBehaviour:
   m_Shape:
     rid: 4210777841563074563
   m_ShapeRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_Mesh: {fileID: 0}
   m_UnmodifiedMeshVersion: 6242
   m_Size: {x: 97.21473, y: 0.573737, z: 94.74895}
+  m_EditionBounds:
+    m_Center: {x: 0, y: 0, z: 0}
+    m_Extent: {x: 0, y: 0, z: 0}
   m_LocalCenter: {x: 0, y: 0, z: 0}
   references:
     version: 2
     RefIds:
     - rid: 4210777841563074563
       type: {class: Cube, ns: UnityEngine.ProBuilder.Shapes, asm: Unity.ProBuilder}
-      data: 
+      data: {}
 --- !u!114 &819224569
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2945,6 +3145,7 @@ MonoBehaviour:
   - {x: -1, y: 0, z: 0, w: -1}
   - {x: -1, y: 0, z: 0, w: -1}
   m_Colors: []
+  <userCollisions>k__BackingField: 0
   m_UnwrapParameters:
     m_HardAngle: 88
     m_PackMargin: 20
@@ -2958,6 +3159,10 @@ MonoBehaviour:
   m_SelectedFaces: 
   m_SelectedEdges: []
   m_SelectedVertices: 
+  m_SelectedCacheDirty: 1
+  m_SelectedSharedVerticesCount: 0
+  m_SelectedCoincidentVertexCount: 0
+  m_SelectedCoincidentVertices: 
 --- !u!4 &819224570
 Transform:
   m_ObjectHideFlags: 0
@@ -3007,6 +3212,10 @@ MonoBehaviour:
   blendDistance: 0
   weight: 1
   sharedProfile: {fileID: 11400000, guid: 10fc4df2da32a41aaa32d77bc913491c, type: 2}
+  m_Colliders: []
+  m_PreviousLayer: 0
+  m_PreviousPriority: 0
+  m_InternalProfile: {fileID: 0}
 --- !u!4 &832575519
 Transform:
   m_ObjectHideFlags: 0
@@ -3053,8 +3262,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_SendPointerHoverToParent: 1
+  m_EventSystem: {fileID: 0}
+  m_InputOverride: {fileID: 0}
+  m_DefaultInput: {fileID: 0}
   m_MoveRepeatDelay: 0.5
   m_MoveRepeatRate: 0.1
+  m_TrackedDeviceDragThresholdMultiplier: 2
   m_XRTrackingOrigin: {fileID: 0}
   m_ActionsAsset: {fileID: -944628639613478452, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
   m_PointAction: {fileID: -1654692200621890270, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
@@ -3083,9 +3296,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76c392e42b5098c458856cdf6ecaaaa1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_SystemInputModules: []
+  m_CurrentInputModule: {fileID: 0}
   m_FirstSelected: {fileID: 0}
   m_sendNavigationEvents: 1
   m_DragThreshold: 10
+  m_CurrentSelected: {fileID: 0}
+  m_HasFocus: 1
+  m_SelectionGuard: 0
+  m_Started: 0
+  m_IsTrackingUIToolkitPanels: 0
 --- !u!4 &868513838
 Transform:
   m_ObjectHideFlags: 0
@@ -3132,11 +3352,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc42784cf147c0c48a680349fa168899, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_RootRaycaster: {fileID: 0}
   m_IgnoreReversedGraphics: 1
   m_BlockingObjects: 0
   m_BlockingMask:
-    serializedVersion: 2
     m_Bits: 4294967295
+  m_Canvas: {fileID: 0}
 --- !u!114 &1022101206
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3159,6 +3380,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
+  m_Canvas: {fileID: 0}
   m_PresetInfoIsWorld: 0
 --- !u!223 &1022101207
 Canvas:
@@ -3260,84 +3482,323 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color:
+    r: 1
+    g: 1
+    b: 1
+    a: 1
   m_RaycastTarget: 1
+  m_RaycastTargetCache: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  <useLegacyMeshGeneration>k__BackingField: 1
   m_Maskable: 1
+  m_IsMaskingGraphic: 0
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
+    m_CallsDirty: 1
   m_text: Left Leg dist
+  m_IsTextBackingStringDirty: 0
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_currentFontAsset: {fileID: 0}
+  m_isSDFShader: 0
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_currentMaterial: {fileID: 0}
+  m_currentMaterialIndex: 0
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
+  m_isMaterialDirty: 0
   m_fontColor32:
-    serializedVersion: 2
     rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+  m_fontColor:
+    r: 1
+    g: 1
+    b: 1
+    a: 1
+  m_underlineColor:
+    rgba: 4294967295
+  m_strikethroughColor:
+    rgba: 4294967295
+  m_ConvertToLinearSpace: 0
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
-    topLeft: {r: 1, g: 1, b: 1, a: 1}
-    topRight: {r: 1, g: 1, b: 1, a: 1}
-    bottomLeft: {r: 1, g: 1, b: 1, a: 1}
-    bottomRight: {r: 1, g: 1, b: 1, a: 1}
+    topLeft:
+      r: 1
+      g: 1
+      b: 1
+      a: 1
+    topRight:
+      r: 1
+      g: 1
+      b: 1
+      a: 1
+    bottomLeft:
+      r: 1
+      g: 1
+      b: 1
+      a: 1
+    bottomRight:
+      r: 1
+      g: 1
+      b: 1
+      a: 1
   m_fontColorGradientPreset: {fileID: 0}
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
+  m_tintSprite: 0
+  m_spriteColor:
+    rgba: 0
   m_StyleSheet: {fileID: 0}
+  m_TextStyle:
+    m_Name: 
+    m_HashCode: 0
+    m_OpeningDefinition: 
+    m_ClosingDefinition: 
+    m_OpeningTagArray: []
+    m_ClosingTagArray: []
   m_TextStyleHashCode: -1183493901
   m_overrideHtmlColors: 0
   m_faceColor:
-    serializedVersion: 2
     rgba: 4294967295
+  m_outlineColor:
+    rgba: 4278190080
+  m_outlineWidth: 0
+  m_currentEnvMapRotation: {x: 0, y: 0, z: 0}
+  m_hasEnvMapProperty: 0
   m_fontSize: 28
+  m_currentFontSize: 0
   m_fontSizeBase: 28
   m_fontWeight: 400
+  m_FontWeightInternal: 400
   m_enableAutoSizing: 0
+  m_maxFontSize: 0
+  m_minFontSize: 0
+  m_AutoSizeIterationCount: 0
+  m_AutoSizeMaxIterationCount: 100
+  m_IsAutoSizePointSizeSet: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
+  m_FontStyleInternal: 0
+  m_isUsingBold: 0
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 256
   m_textAlignment: 65535
+  m_lineJustification: 0
+  m_textContainerLocalCorners:
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
   m_characterSpacing: 0
+  m_cSpacing: 0
+  m_monoSpacing: 0
+  m_duoSpace: 0
   m_wordSpacing: 0
   m_lineSpacing: 0
+  m_lineSpacingDelta: 0
+  m_lineHeight: -32767
+  m_IsDrivenLineSpacing: 0
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
+  m_charWidthAdjDelta: 0
   m_TextWrappingMode: 1
+  m_isCharacterWrappingEnabled: 0
+  m_isNonBreakingSpace: 0
+  m_isIgnoringAlignment: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
+  m_firstOverflowCharacterIndex: -1
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
+  m_isTextTruncated: 0
   m_enableKerning: 0
-  m_ActiveFontFeatures: 6e72656b
+  m_LastBaseGlyphIndex: 0
+  m_ActiveFontFeatures:
+  - 1801810542
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
   m_EmojiFallbackSupport: 1
   m_parseCtrlCharacters: 1
+  m_isOverlay: 0
   m_isOrthographic: 1
   m_isCullingEnabled: 0
+  m_isMaskingEnabled: 0
+  isMaskUpdateRequired: 0
+  m_ignoreCulling: 1
   m_horizontalMapping: 0
   m_verticalMapping: 0
   m_uvLineOffset: 0
+  m_renderMode: 255
   m_geometrySortingOrder: 0
   m_IsTextObjectScaleStatic: 0
   m_VertexBufferAutoSizeReduction: 0
+  m_firstVisibleCharacter: 0
+  m_maxVisibleCharacters: 99999
+  m_maxVisibleWords: 99999
+  m_maxVisibleLines: 99999
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
+  m_isNewPage: 0
   m_margin: {x: 0, y: 0, z: -99.53543, w: 0}
+  m_marginLeft: 0
+  m_marginRight: 0
+  m_marginWidth: 0
+  m_marginHeight: 0
+  m_width: -1
+  m_textInfo: {textComponent: {fileID: 0}, characterCount: 0, spriteCount: 0, spaceCount: 0, wordCount: 0, linkCount: 0, lineCount: 0, pageCount: 0, materialCount: 0}
+  m_havePropertiesChanged: 0
   m_isUsingLegacyAnimationComponent: 0
+  m_transform: {fileID: 0}
+  m_rectTransform: {fileID: 0}
+  m_PreviousRectTransformSize: {x: 0, y: 0}
+  m_PreviousPivotPosition: {x: 0, y: 0}
+  <autoSizeTextContainer>k__BackingField: 0
+  m_autoSizeTextContainer: 0
+  m_mesh: {fileID: 0}
   m_isVolumetricText: 0
+  m_spriteAnimator: {fileID: 0}
+  m_flexibleHeight: -1
+  m_flexibleWidth: -1
+  m_minWidth: 0
+  m_minHeight: 0
+  m_maxWidth: 0
+  m_maxHeight: 0
+  m_LayoutElement: {fileID: 0}
+  m_preferredWidth: 0
+  m_RenderedWidth: 0
+  m_isPreferredWidthDirty: 0
+  m_preferredHeight: 0
+  m_RenderedHeight: 0
+  m_isPreferredHeightDirty: 0
+  m_isCalculatingPreferredValues: 0
+  m_layoutPriority: 0
+  m_isLayoutDirty: 0
+  m_isAwake: 0
+  m_isWaitingOnResourceLoad: 0
+  m_inputSource: 0
+  m_fontScaleMultiplier: 0
+  tag_LineIndent: 0
+  tag_Indent: 0
+  tag_NoParsing: 0
+  m_isTextLayoutPhase: 0
+  m_FXRotation: {x: 0, y: 0, z: 0, w: 0}
+  m_FXScale: {x: 0, y: 0, z: 0}
+  m_InternalTextProcessingArraySize: 0
+  m_totalCharacterCount: 0
+  m_characterCount: 0
+  m_firstCharacterOfLine: 0
+  m_firstVisibleCharacterOfLine: 0
+  m_lastCharacterOfLine: 0
+  m_lastVisibleCharacterOfLine: 0
+  m_lineNumber: 0
+  m_lineVisibleCharacterCount: 0
+  m_lineVisibleSpaceCount: 0
+  m_pageNumber: 0
+  m_PageAscender: 0
+  m_maxTextAscender: 0
+  m_maxCapHeight: 0
+  m_ElementAscender: 0
+  m_ElementDescender: 0
+  m_maxLineAscender: 0
+  m_maxLineDescender: 0
+  m_startOfLineAscender: 0
+  m_startOfLineDescender: 0
+  m_lineOffset: 0
+  m_htmlColor:
+    rgba: 4294967295
+  m_colorGradientPreset: {fileID: 0}
+  m_colorGradientPresetIsTinted: 0
+  m_tabSpacing: 0
+  m_spacing: 0
+  m_TextStyleStackDepth: 0
+  m_ItalicAngle: 0
+  m_padding: 0
+  m_baselineOffset: 0
+  m_xAdvance: 0
+  m_textElementType: 0
+  m_cached_TextElement:
+    m_ElementType: 0
+    m_Unicode: 0
+    m_TextAsset: {fileID: 0}
+    m_Glyph:
+      m_Index: 0
+      m_Metrics:
+        m_Width: 0
+        m_Height: 0
+        m_HorizontalBearingX: 0
+        m_HorizontalBearingY: 0
+        m_HorizontalAdvance: 0
+      m_GlyphRect:
+        m_X: 0
+        m_Y: 0
+        m_Width: 0
+        m_Height: 0
+      m_Scale: 1
+      m_AtlasIndex: 0
+      m_ClassDefinitionType: 0
+    m_GlyphIndex: 0
+    m_Scale: 0
+  m_defaultSpriteAsset: {fileID: 0}
+  m_currentSpriteAsset: {fileID: 0}
+  m_spriteCount: 0
+  m_spriteIndex: 0
+  m_spriteAnimationID: 0
+  m_ignoreActiveState: 0
+  m_isRebuildingLayout: 0
+  m_ShouldUpdateCulling: 0
+  m_ClipRect:
+    x: 0
+    y: 0
+    width: 0
+    height: 0
+  m_ValidRect: 0
   m_hasFontAssetChanged: 0
+  m_subTextObjects:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  m_previousLossyScaleY: -1
+  m_RectTransformCorners:
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  m_canvasRenderer: {fileID: 0}
+  m_canvas: {fileID: 0}
+  m_CanvasScaleFactor: 0
+  m_isFirstAllocation: 0
+  m_max_characters: 8
   m_baseMaterial: {fileID: 0}
+  m_isScrollRegionSet: 0
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+  m_EnvMapMatrix:
+    e00: 0
+    e01: 0
+    e02: 0
+    e03: 0
+    e10: 0
+    e11: 0
+    e12: 0
+    e13: 0
+    e20: 0
+    e21: 0
+    e22: 0
+    e23: 0
+    e30: 0
+    e31: 0
+    e32: 0
+    e33: 0
 --- !u!222 &1177748703
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -3580,20 +4041,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7f348de185a614a4c833064a0dff6645, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rgbody: {fileID: 0}
+  cam: {fileID: 0}
+  animator: {fileID: 0}
   walkSpeed: 7
   acceleration: 10
   deceleration: 30
   rotationSpeed: 10
   dashImpulseMagnitude: 30
+  targetSpeed: -1
+  moveDirection: {x: 0, y: 0, z: 0}
+  currentVelocity: {x: 0, y: 0, z: 0}
   jumpHeight: 20
   isGrounded: 1
   groundCheckDistance: 0.4
   rayGroundCheckStartPos: -0.5
   groundLayer:
-    serializedVersion: 2
     m_Bits: 8
   gravityForce: 60
   applyGravityForceThreshold: 19.5
+  isMoving: 0
 --- !u!54 &1475574904
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -3639,12 +4106,15 @@ MonoBehaviour:
   m_DeviceLostEvent:
     m_PersistentCalls:
       m_Calls: []
+    m_CallsDirty: 1
   m_DeviceRegainedEvent:
     m_PersistentCalls:
       m_Calls: []
+    m_CallsDirty: 1
   m_ControlsChangedEvent:
     m_PersistentCalls:
       m_Calls: []
+    m_CallsDirty: 1
   m_ActionEvents: []
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: Keyboard&Mouse
@@ -3778,10 +4248,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   legName: right
   stepCurve:
-    serializedVersion: 2
     m_Curve:
-    - serializedVersion: 3
-      time: 0
+    - time: 0
       value: 0
       inSlope: 4.8480554
       outSlope: 4.8480554
@@ -3789,8 +4257,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0
       outWeight: 0.029910319
-    - serializedVersion: 3
-      time: 0.49999917
+    - time: 0.49999917
       value: 0.99999857
       inSlope: 0.011593358
       outSlope: 0.011593358
@@ -3798,8 +4265,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.23624535
-    - serializedVersion: 3
-      time: 1
+    - time: 1
       value: 0
       inSlope: -4.615209
       outSlope: -4.615209
@@ -3811,15 +4277,28 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   terrainLayer:
-    serializedVersion: 2
     m_Bits: 8
   body: {fileID: 1030121315}
   footOffset: {x: 0, y: 0, z: 0}
+  oldPosition: {x: 0, y: 0, z: 0}
+  newPosition: {x: 0, y: 0, z: 0}
+  currentPosition: {x: 0, y: 0, z: 0}
+  moveTimer: 0
+  isMoving: 0
+  isDone: 0
+  movesToPerform: 0
+  currentRotation: 0
+  rotationAmount: 0
+  proceduralLegAnimation: {fileID: 0}
+  playerController: {fileID: 0}
   stepDistance: 2
+  rotationAngle: 15
+  velocityFactor: 1
   moveDuration: 0.25
   stepHeight: 2
   legInterval: 0.125
   legIndexToMove: 0
+  <StartMoveTime>k__BackingField: 0
 --- !u!1 &1838748393 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 202844136719166697, guid: fda4b3987420a4b49a249311c7876550, type: 3}
@@ -4009,10 +4488,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   legName: left
   stepCurve:
-    serializedVersion: 2
     m_Curve:
-    - serializedVersion: 3
-      time: 0
+    - time: 0
       value: 0
       inSlope: 4.8480554
       outSlope: 4.8480554
@@ -4020,8 +4497,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0
       outWeight: 0.029910319
-    - serializedVersion: 3
-      time: 0.49999917
+    - time: 0.49999917
       value: 0.99999857
       inSlope: 0.011593358
       outSlope: 0.011593358
@@ -4029,8 +4505,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.23624535
-    - serializedVersion: 3
-      time: 1
+    - time: 1
       value: 0
       inSlope: -4.615209
       outSlope: -4.615209
@@ -4042,15 +4517,28 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   terrainLayer:
-    serializedVersion: 2
     m_Bits: 8
   body: {fileID: 1030121315}
   footOffset: {x: 0, y: 0, z: 0}
+  oldPosition: {x: 0, y: 0, z: 0}
+  newPosition: {x: 0, y: 0, z: 0}
+  currentPosition: {x: 0, y: 0, z: 0}
+  moveTimer: 0
+  isMoving: 0
+  isDone: 0
+  movesToPerform: 0
+  currentRotation: 0
+  rotationAmount: 0
+  proceduralLegAnimation: {fileID: 0}
+  playerController: {fileID: 0}
   stepDistance: 2
+  rotationAngle: 15
+  velocityFactor: 1
   moveDuration: 0.25
   stepHeight: 2
   legInterval: 0.125
   legIndexToMove: 0
+  <StartMoveTime>k__BackingField: 0
 --- !u!1 &2133888483
 GameObject:
   m_ObjectHideFlags: 0
@@ -4085,10 +4573,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   legName: L1
   stepCurve:
-    serializedVersion: 2
     m_Curve:
-    - serializedVersion: 3
-      time: 0
+    - time: 0
       value: 0
       inSlope: 4.8480554
       outSlope: 4.8480554
@@ -4096,8 +4582,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0
       outWeight: 0.029910319
-    - serializedVersion: 3
-      time: 0.49999917
+    - time: 0.49999917
       value: 0.99999857
       inSlope: 0.011593358
       outSlope: 0.011593358
@@ -4105,8 +4590,7 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.23624535
-    - serializedVersion: 3
-      time: 1
+    - time: 1
       value: 0
       inSlope: -4.615209
       outSlope: -4.615209
@@ -4118,15 +4602,28 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   terrainLayer:
-    serializedVersion: 2
     m_Bits: 8
   body: {fileID: 131292814}
   footOffset: {x: 0, y: 0.15, z: 0}
+  oldPosition: {x: 0, y: 0, z: 0}
+  newPosition: {x: 0, y: 0, z: 0}
+  currentPosition: {x: 0, y: 0, z: 0}
+  moveTimer: 0
+  isMoving: 0
+  isDone: 0
+  movesToPerform: 0
+  currentRotation: 0
+  rotationAmount: 0
+  proceduralLegAnimation: {fileID: 0}
+  playerController: {fileID: 0}
   stepDistance: 2
-  moveDuration: 0.125
+  rotationAngle: 15
+  velocityFactor: 0
+  moveDuration: 0.25
   stepHeight: 2
   legInterval: 0.125
   legIndexToMove: 0
+  <StartMoveTime>k__BackingField: 0
 --- !u!65 &2133888485
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -4266,84 +4763,323 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color:
+    r: 1
+    g: 1
+    b: 1
+    a: 1
   m_RaycastTarget: 1
+  m_RaycastTargetCache: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  <useLegacyMeshGeneration>k__BackingField: 1
   m_Maskable: 1
+  m_IsMaskingGraphic: 0
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
+    m_CallsDirty: 1
   m_text: Right Leg dist
+  m_IsTextBackingStringDirty: 0
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_currentFontAsset: {fileID: 0}
+  m_isSDFShader: 0
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_currentMaterial: {fileID: 0}
+  m_currentMaterialIndex: 0
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
+  m_isMaterialDirty: 0
   m_fontColor32:
-    serializedVersion: 2
     rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+  m_fontColor:
+    r: 1
+    g: 1
+    b: 1
+    a: 1
+  m_underlineColor:
+    rgba: 4294967295
+  m_strikethroughColor:
+    rgba: 4294967295
+  m_ConvertToLinearSpace: 0
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
-    topLeft: {r: 1, g: 1, b: 1, a: 1}
-    topRight: {r: 1, g: 1, b: 1, a: 1}
-    bottomLeft: {r: 1, g: 1, b: 1, a: 1}
-    bottomRight: {r: 1, g: 1, b: 1, a: 1}
+    topLeft:
+      r: 1
+      g: 1
+      b: 1
+      a: 1
+    topRight:
+      r: 1
+      g: 1
+      b: 1
+      a: 1
+    bottomLeft:
+      r: 1
+      g: 1
+      b: 1
+      a: 1
+    bottomRight:
+      r: 1
+      g: 1
+      b: 1
+      a: 1
   m_fontColorGradientPreset: {fileID: 0}
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
+  m_tintSprite: 0
+  m_spriteColor:
+    rgba: 0
   m_StyleSheet: {fileID: 0}
+  m_TextStyle:
+    m_Name: 
+    m_HashCode: 0
+    m_OpeningDefinition: 
+    m_ClosingDefinition: 
+    m_OpeningTagArray: []
+    m_ClosingTagArray: []
   m_TextStyleHashCode: -1183493901
   m_overrideHtmlColors: 0
   m_faceColor:
-    serializedVersion: 2
     rgba: 4294967295
+  m_outlineColor:
+    rgba: 4278190080
+  m_outlineWidth: 0
+  m_currentEnvMapRotation: {x: 0, y: 0, z: 0}
+  m_hasEnvMapProperty: 0
   m_fontSize: 28
+  m_currentFontSize: 0
   m_fontSizeBase: 28
   m_fontWeight: 400
+  m_FontWeightInternal: 400
   m_enableAutoSizing: 0
+  m_maxFontSize: 0
+  m_minFontSize: 0
+  m_AutoSizeIterationCount: 0
+  m_AutoSizeMaxIterationCount: 100
+  m_IsAutoSizePointSizeSet: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
+  m_FontStyleInternal: 0
+  m_isUsingBold: 0
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 256
   m_textAlignment: 65535
+  m_lineJustification: 0
+  m_textContainerLocalCorners:
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
   m_characterSpacing: 0
+  m_cSpacing: 0
+  m_monoSpacing: 0
+  m_duoSpace: 0
   m_wordSpacing: 0
   m_lineSpacing: 0
+  m_lineSpacingDelta: 0
+  m_lineHeight: -32767
+  m_IsDrivenLineSpacing: 0
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
+  m_charWidthAdjDelta: 0
   m_TextWrappingMode: 1
+  m_isCharacterWrappingEnabled: 0
+  m_isNonBreakingSpace: 0
+  m_isIgnoringAlignment: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
+  m_firstOverflowCharacterIndex: -1
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
+  m_isTextTruncated: 0
   m_enableKerning: 0
-  m_ActiveFontFeatures: 6e72656b
+  m_LastBaseGlyphIndex: 0
+  m_ActiveFontFeatures:
+  - 1801810542
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
   m_EmojiFallbackSupport: 1
   m_parseCtrlCharacters: 1
+  m_isOverlay: 0
   m_isOrthographic: 1
   m_isCullingEnabled: 0
+  m_isMaskingEnabled: 0
+  isMaskUpdateRequired: 0
+  m_ignoreCulling: 1
   m_horizontalMapping: 0
   m_verticalMapping: 0
   m_uvLineOffset: 0
+  m_renderMode: 255
   m_geometrySortingOrder: 0
   m_IsTextObjectScaleStatic: 0
   m_VertexBufferAutoSizeReduction: 0
+  m_firstVisibleCharacter: 0
+  m_maxVisibleCharacters: 99999
+  m_maxVisibleWords: 99999
+  m_maxVisibleLines: 99999
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
+  m_isNewPage: 0
   m_margin: {x: 0, y: 0, z: -168.50201, w: 0}
+  m_marginLeft: 0
+  m_marginRight: 0
+  m_marginWidth: 0
+  m_marginHeight: 0
+  m_width: -1
+  m_textInfo: {textComponent: {fileID: 0}, characterCount: 0, spriteCount: 0, spaceCount: 0, wordCount: 0, linkCount: 0, lineCount: 0, pageCount: 0, materialCount: 0}
+  m_havePropertiesChanged: 0
   m_isUsingLegacyAnimationComponent: 0
+  m_transform: {fileID: 0}
+  m_rectTransform: {fileID: 0}
+  m_PreviousRectTransformSize: {x: 0, y: 0}
+  m_PreviousPivotPosition: {x: 0, y: 0}
+  <autoSizeTextContainer>k__BackingField: 0
+  m_autoSizeTextContainer: 0
+  m_mesh: {fileID: 0}
   m_isVolumetricText: 0
+  m_spriteAnimator: {fileID: 0}
+  m_flexibleHeight: -1
+  m_flexibleWidth: -1
+  m_minWidth: 0
+  m_minHeight: 0
+  m_maxWidth: 0
+  m_maxHeight: 0
+  m_LayoutElement: {fileID: 0}
+  m_preferredWidth: 0
+  m_RenderedWidth: 0
+  m_isPreferredWidthDirty: 0
+  m_preferredHeight: 0
+  m_RenderedHeight: 0
+  m_isPreferredHeightDirty: 0
+  m_isCalculatingPreferredValues: 0
+  m_layoutPriority: 0
+  m_isLayoutDirty: 0
+  m_isAwake: 0
+  m_isWaitingOnResourceLoad: 0
+  m_inputSource: 0
+  m_fontScaleMultiplier: 0
+  tag_LineIndent: 0
+  tag_Indent: 0
+  tag_NoParsing: 0
+  m_isTextLayoutPhase: 0
+  m_FXRotation: {x: 0, y: 0, z: 0, w: 0}
+  m_FXScale: {x: 0, y: 0, z: 0}
+  m_InternalTextProcessingArraySize: 0
+  m_totalCharacterCount: 0
+  m_characterCount: 0
+  m_firstCharacterOfLine: 0
+  m_firstVisibleCharacterOfLine: 0
+  m_lastCharacterOfLine: 0
+  m_lastVisibleCharacterOfLine: 0
+  m_lineNumber: 0
+  m_lineVisibleCharacterCount: 0
+  m_lineVisibleSpaceCount: 0
+  m_pageNumber: 0
+  m_PageAscender: 0
+  m_maxTextAscender: 0
+  m_maxCapHeight: 0
+  m_ElementAscender: 0
+  m_ElementDescender: 0
+  m_maxLineAscender: 0
+  m_maxLineDescender: 0
+  m_startOfLineAscender: 0
+  m_startOfLineDescender: 0
+  m_lineOffset: 0
+  m_htmlColor:
+    rgba: 4294967295
+  m_colorGradientPreset: {fileID: 0}
+  m_colorGradientPresetIsTinted: 0
+  m_tabSpacing: 0
+  m_spacing: 0
+  m_TextStyleStackDepth: 0
+  m_ItalicAngle: 0
+  m_padding: 0
+  m_baselineOffset: 0
+  m_xAdvance: 0
+  m_textElementType: 0
+  m_cached_TextElement:
+    m_ElementType: 0
+    m_Unicode: 0
+    m_TextAsset: {fileID: 0}
+    m_Glyph:
+      m_Index: 0
+      m_Metrics:
+        m_Width: 0
+        m_Height: 0
+        m_HorizontalBearingX: 0
+        m_HorizontalBearingY: 0
+        m_HorizontalAdvance: 0
+      m_GlyphRect:
+        m_X: 0
+        m_Y: 0
+        m_Width: 0
+        m_Height: 0
+      m_Scale: 1
+      m_AtlasIndex: 0
+      m_ClassDefinitionType: 0
+    m_GlyphIndex: 0
+    m_Scale: 0
+  m_defaultSpriteAsset: {fileID: 0}
+  m_currentSpriteAsset: {fileID: 0}
+  m_spriteCount: 0
+  m_spriteIndex: 0
+  m_spriteAnimationID: 0
+  m_ignoreActiveState: 0
+  m_isRebuildingLayout: 0
+  m_ShouldUpdateCulling: 0
+  m_ClipRect:
+    x: 0
+    y: 0
+    width: 0
+    height: 0
+  m_ValidRect: 0
   m_hasFontAssetChanged: 0
+  m_subTextObjects:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  m_previousLossyScaleY: -1
+  m_RectTransformCorners:
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  m_canvasRenderer: {fileID: 0}
+  m_canvas: {fileID: 0}
+  m_CanvasScaleFactor: 0
+  m_isFirstAllocation: 0
+  m_max_characters: 8
   m_baseMaterial: {fileID: 0}
+  m_isScrollRegionSet: 0
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+  m_EnvMapMatrix:
+    e00: 0
+    e01: 0
+    e02: 0
+    e03: 0
+    e10: 0
+    e11: 0
+    e12: 0
+    e13: 0
+    e20: 0
+    e21: 0
+    e22: 0
+    e23: 0
+    e30: 0
+    e31: 0
+    e32: 0
+    e33: 0
 --- !u!222 &2137647696
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -4365,13 +5101,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   terrainLayer:
-    serializedVersion: 2
     m_Bits: 8
   stepDistance: 0.4
   moveDuration: 0.1
   stepHeight: 0.4
   legInterval: 0.05
   currentLegIndex: 0
+  maxLegIndex: 0
   legs:
   - {fileID: 2112414688}
   - {fileID: 1637659430}
@@ -4379,7 +5115,12 @@ MonoBehaviour:
   separateStartTimes: []
   raycastDistance: 30
   circleRendererObject: {fileID: 1838748393}
+  circleRenderer: {fileID: 0}
   shouldMove: 0
+  movementStartTime: 0
+  currentBodyPosition: {x: 0, y: 0, z: 0}
+  oldBodyPosition: {x: 0, y: 0, z: 0}
+  distanceMoved: 0
 --- !u!1001 &2409866795236810007
 PrefabInstance:
   m_ObjectHideFlags: 0

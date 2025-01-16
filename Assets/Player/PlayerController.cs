@@ -185,4 +185,9 @@ public class PlayerController : MonoBehaviour
                                                   Time.deltaTime * rotationSpeed);
         }
     }
+
+    public Vector3 GetLinearVelocity()
+    {
+        return rgbody.linearVelocity;
+    }
 }
