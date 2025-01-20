@@ -18,6 +18,7 @@ public class Leg : MonoBehaviour
 
     #region Private Fields
 
+    private Vector3 positionToMove;
     private Vector3 oldPosition;
     private Vector3 newPosition;
     private Vector3 currentPosition;
@@ -91,7 +92,7 @@ public class Leg : MonoBehaviour
 
     void Start()
     {
-        body = transform.parent.gameObject;
+        // body = transform.parent.gameObject;
         proceduralLegAnimation = body?.GetComponent<ProceduralLegAnimation>();
         playerController = body?.GetComponent<PlayerController>();
         // footOffset = transform.localPosition;
@@ -120,7 +121,7 @@ public class Leg : MonoBehaviour
                     if (legIndexToMove == proceduralLegAnimation.currentLegIndex)
                     {
                         Vector3 predictedStepPosition = PredictStepPosition(oldHit.point, newHit.point, playerController.GetLinearVelocity(), velocityFactor);
-                        MoveLeg(predictedStepPosition, moveDuration, stepHeight);
+                        MoveLeg(positionToMove, moveDuration, stepHeight);
                     }
                 }
             }
@@ -129,15 +130,20 @@ public class Leg : MonoBehaviour
         // Move leg if the leg rotated more than the rotation angle
         if (rotationAmount >= maxRotation)
         {
-            Debug.Log("Rotate legs!");
-            // Then reset the rotated amount to 0
-            currentRotation = body.transform.rotation.y;
-            // Read the current rotation in Euler angles
-            Vector3 currentEuler = transform.rotation.eulerAngles;
-            // Adjust the y-rotation
-            currentEuler.y = currentRotation;
-            // Convert back to a Quaternion
-            transform.rotation = Quaternion.Euler(currentEuler);
+            if (legIndexToMove == proceduralLegAnimation.currentLegIndex)
+            {
+                Debug.Log("Rotate legs!");
+                // Then reset the rotated amount to 0
+                currentRotation = body.transform.rotation.y;
+                // Read the current rotation in Euler angles
+                Vector3 currentEuler = transform.rotation.eulerAngles;
+                // Adjust the y-rotation
+                currentEuler.y = currentRotation;
+                // Convert back to a Quaternion
+                transform.rotation = Quaternion.Euler(currentEuler);
+
+                MoveLeg(positionToMove, moveDuration, stepHeight);
+            }
         }
 
         rotationAmount = Mathf.Abs(body.transform.rotation.y - currentRotation);
@@ -226,6 +232,7 @@ public class Leg : MonoBehaviour
         if (Physics.Raycast(sphereRayOrigin, Vector3.down, out RaycastHit hitSphere, 10, terrainLayer))
         {
             // 5. Draw the sphere at the hit point.
+            positionToMove = hitSphere.point;
             Gizmos.DrawSphere(hitSphere.point, 0.2f);
 
             // If you need to draw a line from that hit to another point (like oldPosition),
