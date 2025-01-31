@@ -9,6 +9,8 @@ public class Leg : MonoBehaviour
     public string legName;
     [SerializeField] private AnimationCurve stepCurve;
     [SerializeField] private LayerMask terrainLayer;
+    public enum LegGroup { GroupA, GroupB }
+    public LegGroup legGroup; // Assign in Inspector
 
     [Header("References")]
     public GameObject body;
@@ -112,26 +114,11 @@ public class Leg : MonoBehaviour
 
     void Update()
     {
-        UpdatePositionToMove();
+        UpdatePositionToMove(); // Update target position every frame
 
-        // Only check for new movement if NOT already moving
-        if (!isMoving)
+        if (isMoving)
         {
-            if (Physics.Raycast(footOffset + body.transform.position + Vector3.up * 0.5f, Vector3.down,
-                out RaycastHit newHit, 10, terrainLayer))
-            {
-                float distanceMoved = Vector3.Distance(oldPosition, positionToMove);
-                bool needsToMove = distanceMoved >= stepDistance || rotationAmount >= maxRotation;
-
-                if (needsToMove)
-                {
-                    StartMove(positionToMove); // Initialize movement
-                }
-            }
-        }
-        else
-        {
-            UpdateMove(); // Continue updating movement every frame
+            UpdateMove(); // Continue moving if already in motion
         }
 
         // Update rotation tracking

@@ -20,6 +20,9 @@ public class ProceduralLegAnimation : MonoBehaviour
     [SerializeField] private int maxConcurrentMoves = 2; // Set this in Inspector
     private List<Leg> activeMovingLegs = new List<Leg>();
 
+    [Header("Stability")]
+    [SerializeField] private int minGroundedLegs = 2;
+
     [Header("Separate Start Times")]
     [SerializeField] private bool useSeparateStartTimes = false;
     [SerializeField] private List<float> separateStartTimes = new List<float>();    // Make sure separateStartTimes matches legs.Count if useSeparateStartTimes is true
@@ -40,6 +43,16 @@ public class ProceduralLegAnimation : MonoBehaviour
     private Vector3 oldBodyPosition;
     private float distanceMoved;
 
+    private int GetGroundedLegs()
+    {
+        int grounded = 0;
+        foreach (var leg in legs)
+        {
+            if (!leg.IsMoving) grounded++;
+        }
+        return grounded;
+    }
+
     void Start()
     {
         // Setting old body position
@@ -57,6 +70,9 @@ public class ProceduralLegAnimation : MonoBehaviour
 
     void Update()
     {
+        // Block movement if unstable
+        if (GetGroundedLegs() < minGroundedLegs) return;
+
         List<Leg> eligibleLegs = new List<Leg>();
 
         foreach (var leg in legs)
