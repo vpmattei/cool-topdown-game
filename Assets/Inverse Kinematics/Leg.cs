@@ -26,6 +26,7 @@ public class Leg : MonoBehaviour
     private bool isMoving = false;
     private bool isDone = false;
     private int movesToPerform = 0;
+    private float distanceMoved = 0f;
     [SerializeField] private float currentRotation = 0f;
     [SerializeField] private float rotationAmount = 0f;
 
@@ -43,7 +44,7 @@ public class Leg : MonoBehaviour
     [SerializeField] private float stepHeight = 2f;     // How high each leg goes
     [SerializeField] private float legInterval = 0.125f; // Time interval between legs starting movement
     [Tooltip("Leg index that indicates at which order this leg will move (0 is first, 1 is second and so on...)")]
-    [SerializeField] private int legIndexToMove = 0; // Leg index that indicates at which order this leg will move
+    // [SerializeField] private int legIndexToMove = 0; // Leg index that indicates at which order this leg will move
 
     #endregion
 
@@ -54,7 +55,7 @@ public class Leg : MonoBehaviour
     /// The int parameter can be the legIndexToMove, 
     /// or you can pass this script instance (LegDebug) if you prefer.
     /// </summary>
-    public event Action<int> OnLegMovementFinished;
+    public event Action OnLegMovementFinished;
 
     #endregion
 
@@ -78,6 +79,7 @@ public class Leg : MonoBehaviour
 
     // Movement settings: public getters/setters
     public float StepDistance { get => stepDistance; set => stepDistance = value; }
+    public float DistanceMoved { get => distanceMoved; }
 
     public float MoveDuration { get => moveDuration; set => moveDuration = value; }
 
@@ -86,7 +88,7 @@ public class Leg : MonoBehaviour
     public float LegInterval { get => legInterval; set => legInterval = value; }
 
     public Vector3 FootOffset { get => footOffset; set => footOffset = value; }
-    public int LegIndexToMove => legIndexToMove; // read-only for external usage
+    // public int LegIndexToMove => legIndexToMove; // read-only for external usage
 
     #endregion
 
@@ -109,71 +111,66 @@ public class Leg : MonoBehaviour
 
     void Update()
     {
-        // Move leg if distance moved is bigger than the step distance
-        if (Physics.Raycast(footOffset + body.transform.position + new Vector3(0, 0.5f, 0), Vector3.down, out RaycastHit newHit, 10, terrainLayer))
-        {
-            if (Physics.Raycast(oldPosition + new Vector3(0, 0.5f, 0), Vector3.down, out RaycastHit oldHit, 10, terrainLayer))
-            {
-                float distanceMoved = Vector3.Distance(oldHit.point, newHit.point);
+        UpdatePositionToMove();
 
-                if (distanceMoved >= stepDistance || isMoving)
+        // Only check for new movement if NOT already moving
+        if (!isMoving)
+        {
+            if (Physics.Raycast(footOffset + body.transform.position + Vector3.up * 0.5f, Vector3.down,
+                out RaycastHit newHit, 10, terrainLayer))
+            {
+                float distanceMoved = Vector3.Distance(oldPosition, positionToMove);
+                bool needsToMove = distanceMoved >= stepDistance || rotationAmount >= maxRotation;
+
+                if (needsToMove)
                 {
-                    if (legIndexToMove == proceduralLegAnimation.currentLegIndex)
-                    {
-                        Vector3 predictedStepPosition = PredictStepPosition(oldHit.point, newHit.point, playerController.GetLinearVelocity(), velocityFactor);
-                        MoveLeg(positionToMove, moveDuration, stepHeight);
-                    }
+                    StartMove(positionToMove); // Initialize movement
                 }
+
+                if (rotationAmount >= maxRotation) currentRotation = body.transform.eulerAngles.y;  // Reset rotation if it has surpassed the maximum rotation allowed
             }
         }
-
-        // Move leg if the leg rotated more than the rotation angle
-        if (rotationAmount >= maxRotation)
+        else
         {
-            if (legIndexToMove == proceduralLegAnimation.currentLegIndex)
-            {
-                Debug.Log("Rotate legs!");
-                // Then reset the rotated amount to 0
-                currentRotation = body.transform.rotation.y;
-                // Read the current rotation in Euler angles
-                Vector3 currentEuler = transform.rotation.eulerAngles;
-                // Adjust the y-rotation
-                currentEuler.y = currentRotation;
-                // Convert back to a Quaternion
-                transform.rotation = Quaternion.Euler(currentEuler);
-
-                MoveLeg(positionToMove, moveDuration, stepHeight);
-            }
+            UpdateMove(); // Continue updating movement every frame
         }
 
-        rotationAmount = Mathf.Abs(body.transform.rotation.y - currentRotation);
+        // Update rotation tracking
+        rotationAmount = Mathf.Abs(body.transform.eulerAngles.y - currentRotation);
         transform.position = currentPosition;
     }
 
-    public void MoveLeg(Vector3 positionToMove, float moveDuration, float stepHeight)
+    private void UpdatePositionToMove()
     {
-        // If we are starting a new movement sequence:
-        if (!isMoving)
-        {
-            oldPosition = currentPosition;
-            newPosition = positionToMove;
-            isMoving = true;
-            isDone = false;
-            moveTimer = 0f; // Reset the move timer for this new step
-        }
+        Vector3 pivot = body.transform.position + new Vector3(0, 0.5f, 0);
+        Vector3 rotatedOffset = body.transform.rotation * footOffset;
+        Vector3 sphereRayOrigin = pivot + rotatedOffset;
 
-        // Only update the position while we haven't completed the step
+        if (Physics.Raycast(sphereRayOrigin, Vector3.down, out RaycastHit hitSphere, 10, terrainLayer))
+        {
+            positionToMove = hitSphere.point; // Updated in real-time
+        }
+    }
+
+    private void StartMove(Vector3 targetPosition)
+    {
+        oldPosition = currentPosition;
+        newPosition = targetPosition;
+        isMoving = true;
+        isDone = false;
+        moveTimer = 0f; // Reset timer
+    }
+
+    private void UpdateMove()
+    {
         if (moveTimer < moveDuration)
         {
+            // Smoothly interpolate position over time
             float t = moveTimer / moveDuration;
             Vector3 tempPosition = Vector3.Lerp(oldPosition, newPosition, t);
-
-            // Use the animation curve instead of a sine function
-            float curveValue = stepCurve.Evaluate(t);
-            tempPosition.y += curveValue * stepHeight;
-
+            tempPosition.y += stepCurve.Evaluate(t) * stepHeight; // Apply step height curve
             currentPosition = tempPosition;
-            moveTimer += Time.deltaTime;
+            moveTimer += Time.deltaTime; // Increment timer
         }
         else
         {
@@ -182,11 +179,7 @@ public class Leg : MonoBehaviour
             oldPosition = newPosition;
             isMoving = false;
             isDone = true;
-
-            // Fire the event so ProceduralLegAnimation knows this leg is done
-            OnLegMovementFinished?.Invoke(legIndexToMove);
-
-            // ResetLegState();
+            OnLegMovementFinished?.Invoke(); // Notify system
         }
     }
 
@@ -232,7 +225,6 @@ public class Leg : MonoBehaviour
         if (Physics.Raycast(sphereRayOrigin, Vector3.down, out RaycastHit hitSphere, 10, terrainLayer))
         {
             // 5. Draw the sphere at the hit point.
-            positionToMove = hitSphere.point;
             Gizmos.DrawSphere(hitSphere.point, 0.2f);
 
             // If you need to draw a line from that hit to another point (like oldPosition),

@@ -48,8 +48,6 @@ public class ProceduralLegAnimation : MonoBehaviour
         foreach (var leg in legs)
         {
             leg.OnLegMovementFinished += OnLegDoneMoving;
-
-            if (leg.LegIndexToMove > maxLegIndex) maxLegIndex = leg.LegIndexToMove;
         }
     }
 
@@ -57,36 +55,9 @@ public class ProceduralLegAnimation : MonoBehaviour
     /// Called every time a leg finishes moving. The leg passes its own legIndex.
     /// Once all legs of the "currentLegIndex" have moved, we can increment currentLegIndex.
     /// </summary>
-    private void OnLegDoneMoving(int finishedLegIndex)
+    private void OnLegDoneMoving()
     {
-        // If we only allow one leg at a time, we can just increment
-        // currentLegIndex after each completion:
-        // 
-        // currentLegIndex++;
-        //
-        // Or, if you have multiple legs with the same legIndex, 
-        // you can check if they're all done before incrementing.
-        // For example:
-
-        bool allLegsOfThisIndexDone = true;
-        foreach (var leg in legs)
-        {
-            // If any leg has the same legIndexToMove as the leg that triggered 
-            // the event, but is not done, don't increment yet.
-            if (leg.LegIndexToMove == finishedLegIndex && !leg.IsDone)
-            {
-                allLegsOfThisIndexDone = false;
-                break;
-            }
-        }
-
-        if (allLegsOfThisIndexDone && finishedLegIndex == currentLegIndex)
-        {
-            currentLegIndex++;
-            Debug.Log($"All legs with index {finishedLegIndex} are done. Incrementing currentLegIndex to {currentLegIndex}.");
-
-            if (currentLegIndex > maxLegIndex) currentLegIndex = 0;
-        }
+        // Do nothing, for now..
     }
 
     private void OnGUI()
@@ -117,6 +88,7 @@ public class ProceduralLegAnimation : MonoBehaviour
             if (legs[i].IsMoving) legStatus = "Moving";
             else if (legs[i].IsDone) legStatus = "Done";
             else legStatus = "Not Started";
+            GUILayout.Label($"Distance Moved: {legs[i].DistanceMoved}", style);
             GUILayout.Label(legStatus, style);
         }
         GUILayout.EndVertical();
