@@ -16,6 +16,10 @@ public class ProceduralLegAnimation : MonoBehaviour
     [Header("Legs")]
     [SerializeField] private List<Leg> legs = new List<Leg>();
 
+    [Header("Concurrency")]
+    [SerializeField] private int maxConcurrentMoves = 2; // Set this in Inspector
+    private List<Leg> activeMovingLegs = new List<Leg>();
+
     [Header("Separate Start Times")]
     [SerializeField] private bool useSeparateStartTimes = false;
     [SerializeField] private List<float> separateStartTimes = new List<float>();    // Make sure separateStartTimes matches legs.Count if useSeparateStartTimes is true
@@ -55,7 +59,6 @@ public class ProceduralLegAnimation : MonoBehaviour
     {
         List<Leg> eligibleLegs = new List<Leg>();
 
-        // Collect all legs that need to move
         foreach (var leg in legs)
         {
             if (!leg.IsMoving && leg.CalculateUrgency() >= 1f)
@@ -64,16 +67,24 @@ public class ProceduralLegAnimation : MonoBehaviour
             }
         }
 
-        // Sort by urgency (highest first)
         eligibleLegs.Sort((a, b) => b.CalculateUrgency().CompareTo(a.CalculateUrgency()));
 
-        // Move the most urgent legs first
+        // Move legs only if under concurrency limit
         foreach (var leg in eligibleLegs)
         {
-            if (!leg.IsMoving)
+            if (activeMovingLegs.Count < maxConcurrentMoves && !leg.IsMoving)
             {
                 leg.StartMove(leg.PositionToMove);
+                activeMovingLegs.Add(leg);
             }
+        }
+    }
+
+    public void NotifyLegMovementComplete(Leg leg)
+    {
+        if (activeMovingLegs.Contains(leg))
+        {
+            activeMovingLegs.Remove(leg);
         }
     }
 

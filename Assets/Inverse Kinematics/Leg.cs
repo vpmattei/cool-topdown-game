@@ -180,6 +180,7 @@ public class Leg : MonoBehaviour
             isMoving = false;
             isDone = true;
             OnLegMovementFinished?.Invoke(); // Notify system
+            proceduralLegAnimation.NotifyLegMovementComplete(this);
         }
     }
 
