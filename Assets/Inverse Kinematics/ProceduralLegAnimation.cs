@@ -51,6 +51,32 @@ public class ProceduralLegAnimation : MonoBehaviour
         }
     }
 
+    void Update()
+    {
+        List<Leg> eligibleLegs = new List<Leg>();
+
+        // Collect all legs that need to move
+        foreach (var leg in legs)
+        {
+            if (!leg.IsMoving && leg.CalculateUrgency() >= 1f)
+            {
+                eligibleLegs.Add(leg);
+            }
+        }
+
+        // Sort by urgency (highest first)
+        eligibleLegs.Sort((a, b) => b.CalculateUrgency().CompareTo(a.CalculateUrgency()));
+
+        // Move the most urgent legs first
+        foreach (var leg in eligibleLegs)
+        {
+            if (!leg.IsMoving)
+            {
+                leg.StartMove(leg.PositionToMove);
+            }
+        }
+    }
+
     /// <summary>
     /// Called every time a leg finishes moving. The leg passes its own legIndex.
     /// Once all legs of the "currentLegIndex" have moved, we can increment currentLegIndex.

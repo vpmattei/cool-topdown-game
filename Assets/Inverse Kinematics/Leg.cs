@@ -80,6 +80,7 @@ public class Leg : MonoBehaviour
     // Movement settings: public getters/setters
     public float StepDistance { get => stepDistance; set => stepDistance = value; }
     public float DistanceMoved { get => distanceMoved; }
+    public Vector3 PositionToMove { get => positionToMove; }
 
     public float MoveDuration { get => moveDuration; set => moveDuration = value; }
 
@@ -126,8 +127,6 @@ public class Leg : MonoBehaviour
                 {
                     StartMove(positionToMove); // Initialize movement
                 }
-
-                if (rotationAmount >= maxRotation) currentRotation = body.transform.eulerAngles.y;  // Reset rotation if it has surpassed the maximum rotation allowed
             }
         }
         else
@@ -152,13 +151,14 @@ public class Leg : MonoBehaviour
         }
     }
 
-    private void StartMove(Vector3 targetPosition)
+    public void StartMove(Vector3 targetPosition)
     {
         oldPosition = currentPosition;
         newPosition = targetPosition;
         isMoving = true;
         isDone = false;
         moveTimer = 0f; // Reset timer
+        currentRotation = body.transform.eulerAngles.y;  // Reset rotation
     }
 
     private void UpdateMove()
@@ -181,6 +181,16 @@ public class Leg : MonoBehaviour
             isDone = true;
             OnLegMovementFinished?.Invoke(); // Notify system
         }
+    }
+
+    public float CalculateUrgency()
+    {
+        // Distance urgency (normalized to stepDistance)
+        float distanceUrgency = Vector3.Distance(oldPosition, positionToMove) / stepDistance;
+        // Rotation urgency (normalized to maxRotation)
+        float rotationUrgency = rotationAmount / maxRotation;
+        // Total urgency (clamped to avoid overshooting)
+        return Mathf.Clamp01(distanceUrgency + rotationUrgency);
     }
 
     private Vector3 PredictStepPosition(Vector3 oldHitPoint, Vector3 newHitPoint, Vector3 bodyVelocity, float velocityFactor)
