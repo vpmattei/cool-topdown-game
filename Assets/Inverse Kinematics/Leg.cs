@@ -46,18 +46,13 @@ public class Leg : MonoBehaviour
     [SerializeField] private float stepHeight = 2f;     // How high each leg goes
     [SerializeField] private float legInterval = 0.125f; // Time interval between legs starting movement
     [Tooltip("Leg index that indicates at which order this leg will move (0 is first, 1 is second and so on...)")]
-    // [SerializeField] private int legIndexToMove = 0; // Leg index that indicates at which order this leg will move
 
     #endregion
 
     #region Events
 
-    /// <summary>
-    /// Fired when this leg finishes its movement.
-    /// The int parameter can be the legIndexToMove, 
-    /// or you can pass this script instance (LegDebug) if you prefer.
-    /// </summary>
-    public event Action OnLegMovementFinished;
+    public event Action<Leg> OnLegMovementStarted;
+    public event Action<Leg> OnLegMovementFinished;
 
     #endregion
 
@@ -145,7 +140,8 @@ public class Leg : MonoBehaviour
         isMoving = true;
         isDone = false;
         moveTimer = 0f; // Reset timer
-        currentRotation = body.transform.eulerAngles.y;  // Reset rotation
+        OnLegMovementStarted?.Invoke(this); // Started moving notification to the system
+        // currentRotation = body.transform.eulerAngles.y;  // Reset rotation
     }
 
     private void UpdateMove()
@@ -166,8 +162,10 @@ public class Leg : MonoBehaviour
             oldPosition = newPosition;
             isMoving = false;
             isDone = true;
-            OnLegMovementFinished?.Invoke(); // Notify system
-            proceduralLegAnimation.NotifyLegMovementComplete(this);
+            OnLegMovementFinished?.Invoke(this); // Finished moving notification to the system
+            // proceduralLegAnimation.NotifyLegMovementComplete(this);
+            currentRotation = body.transform.eulerAngles.y;  // Reset rotation
+
         }
     }
 
@@ -178,7 +176,7 @@ public class Leg : MonoBehaviour
         // Rotation urgency (normalized to maxRotation)
         float rotationUrgency = rotationAmount / maxRotation;
         // Total urgency (clamped to avoid overshooting)
-        return Mathf.Clamp01(distanceUrgency + rotationUrgency);
+        return Mathf.Clamp01(distanceUrgency + rotationUrgency * 0.1f);
     }
 
     private Vector3 PredictStepPosition(Vector3 oldHitPoint, Vector3 newHitPoint, Vector3 bodyVelocity, float velocityFactor)

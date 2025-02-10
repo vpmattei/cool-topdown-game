@@ -161,17 +161,30 @@ MonoBehaviour:
   moveDuration: 0.25
   stepHeight: 2
   legInterval: 0.125
-  currentLegIndex: 0
   legs:
   - {fileID: 2133888484}
   - {fileID: 211326310}
   - {fileID: 332148493}
   - {fileID: 226724073}
-  useSeparateStartTimes: 0
-  separateStartTimes: []
-  raycastDistance: 30
-  circleRendererObject: {fileID: 1838748393}
-  shouldMove: 0
+  playerLegs:
+  - name: 
+    currentState: 0
+    group: 0
+    hasMoved: 0
+  - name: 
+    currentState: 0
+    group: 0
+    hasMoved: 0
+  - name: 
+    currentState: 0
+    group: 0
+    hasMoved: 0
+  - name: 
+    currentState: 0
+    group: 0
+    hasMoved: 0
+  maxConcurrentMoves: 2
+  minGroundedLegs: 2
 --- !u!4 &131292816
 Transform:
   m_ObjectHideFlags: 0
@@ -430,17 +443,17 @@ MonoBehaviour:
   terrainLayer:
     serializedVersion: 2
     m_Bits: 8
+  legGroup: 0
   body: {fileID: 131292814}
   footOffset: {x: 1, y: 0.15, z: 0}
   currentRotation: 0
   rotationAmount: 0
   stepDistance: 2
-  maxRotation: 0.15
+  maxRotation: 45
   velocityFactor: 0
   moveDuration: 0.25
   stepHeight: 2
   legInterval: 0.125
-  legIndexToMove: 0
 --- !u!65 &211326311
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -584,17 +597,17 @@ MonoBehaviour:
   terrainLayer:
     serializedVersion: 2
     m_Bits: 8
+  legGroup: 1
   body: {fileID: 131292814}
   footOffset: {x: 0, y: 0.15, z: -1}
   currentRotation: 0
   rotationAmount: 0
   stepDistance: 2
-  maxRotation: 0.15
+  maxRotation: 45
   velocityFactor: 0
   moveDuration: 0.25
   stepHeight: 2
   legInterval: 0.125
-  legIndexToMove: 1
 --- !u!65 &226724074
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1041,17 +1054,17 @@ MonoBehaviour:
   terrainLayer:
     serializedVersion: 2
     m_Bits: 8
+  legGroup: 1
   body: {fileID: 131292814}
   footOffset: {x: 0, y: 0.15, z: 1}
   currentRotation: 0
   rotationAmount: 0
   stepDistance: 2
-  maxRotation: 0.15
+  maxRotation: 45
   velocityFactor: 0
   moveDuration: 0.25
   stepHeight: 2
   legInterval: 0.125
-  legIndexToMove: 1
 --- !u!65 &332148494
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -3821,6 +3834,7 @@ MonoBehaviour:
   terrainLayer:
     serializedVersion: 2
     m_Bits: 8
+  legGroup: 0
   body: {fileID: 1030121315}
   footOffset: {x: 0, y: 0, z: 0}
   currentRotation: 0
@@ -3831,7 +3845,6 @@ MonoBehaviour:
   moveDuration: 0.25
   stepHeight: 2
   legInterval: 0.125
-  legIndexToMove: 0
 --- !u!1 &1838748393 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 202844136719166697, guid: fda4b3987420a4b49a249311c7876550, type: 3}
@@ -4056,6 +4069,7 @@ MonoBehaviour:
   terrainLayer:
     serializedVersion: 2
     m_Bits: 8
+  legGroup: 0
   body: {fileID: 1030121315}
   footOffset: {x: 0, y: 0, z: 0}
   currentRotation: 0
@@ -4066,7 +4080,6 @@ MonoBehaviour:
   moveDuration: 0.25
   stepHeight: 2
   legInterval: 0.125
-  legIndexToMove: 0
 --- !u!1 &2133888483
 GameObject:
   m_ObjectHideFlags: 0
@@ -4136,17 +4149,17 @@ MonoBehaviour:
   terrainLayer:
     serializedVersion: 2
     m_Bits: 8
+  legGroup: 0
   body: {fileID: 131292814}
   footOffset: {x: 0, y: 0.15, z: 0}
   currentRotation: 0
   rotationAmount: 0
   stepDistance: 2
-  maxRotation: 0.15
+  maxRotation: 45
   velocityFactor: 0
   moveDuration: 0.25
   stepHeight: 2
   legInterval: 0.125
-  legIndexToMove: 0
 --- !u!65 &2133888485
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -4391,15 +4404,12 @@ MonoBehaviour:
   moveDuration: 0.1
   stepHeight: 0.4
   legInterval: 0.05
-  currentLegIndex: 0
   legs:
   - {fileID: 2112414688}
   - {fileID: 1637659430}
-  useSeparateStartTimes: 0
-  separateStartTimes: []
-  raycastDistance: 30
-  circleRendererObject: {fileID: 1838748393}
-  shouldMove: 0
+  playerLegs: []
+  maxConcurrentMoves: 2
+  minGroundedLegs: 3
 --- !u!1001 &2409866795236810007
 PrefabInstance:
   m_ObjectHideFlags: 0

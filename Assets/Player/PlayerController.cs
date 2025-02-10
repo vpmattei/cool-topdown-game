@@ -11,7 +11,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField, Range(1, 15)] private float walkSpeed = 7;
     [SerializeField, Range(0.15f, 50)] private float acceleration = 20;
     [SerializeField, Range(0.15f, 50)] private float deceleration = 20;
-    [SerializeField, Range(2, 30)] private float rotationSpeed = 10;
+    [SerializeField, Range(0, 15)] private float rotationSpeed = 10;
     [SerializeField] private float dashImpulseMagnitude = 10;
 
     private float targetSpeed = -1f;
