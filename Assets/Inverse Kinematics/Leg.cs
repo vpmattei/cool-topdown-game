@@ -9,8 +9,8 @@ public class Leg : MonoBehaviour
     public string legName;
     [SerializeField] private AnimationCurve stepCurve;
     [SerializeField] private LayerMask terrainLayer;
-    public enum LegGroup { GroupA, GroupB }
-    public LegGroup legGroup; // Assign in Inspector
+    
+    public String legGroupName = "NONE"; // Assign in Inspector
 
     [Header("References")]
     public GameObject body;

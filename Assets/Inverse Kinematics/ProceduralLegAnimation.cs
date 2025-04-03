@@ -3,20 +3,23 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
-public class PlayerLeg
+// A copy of the leg's class, used as a reference
+// in order for the ProceduralLegAnimation manager
+// have control over each existing leg
+public class LegCopy
 {
     public enum State { Idle, Moving, DoneMoving }
 
     public string name;
     public State currentState;
-    public Leg.LegGroup group;
+    public String groupName;
     public bool hasMoved = false;
 
-    public PlayerLeg(string legName, State state, Leg.LegGroup legGroup)
+    public LegCopy(string legName, State state, String legGroupName)
     {
         name = legName;
         currentState = state;
-        group = legGroup;
+        groupName = legGroupName;
     }
 
     public void SetState(State s)
@@ -49,7 +52,7 @@ public class ProceduralLegAnimation : MonoBehaviour
     [Header("Legs")]
     [SerializeField] private List<Leg> legs = new List<Leg>();
 
-    [SerializeField] private List<PlayerLeg> playerLegs = new List<PlayerLeg>();
+    [SerializeField] private List<LegCopy> legCopies = new List<LegCopy>();
 
     [Header("Concurrency")]
     [SerializeField] private int maxConcurrentMoves = 2; // Set this in Inspector
@@ -85,21 +88,30 @@ public class ProceduralLegAnimation : MonoBehaviour
             leg.OnLegMovementStarted += OnLegStartedMoving;
             leg.OnLegMovementFinished += OnLegDoneMoving;
 
-            // Set playerLegs interfaces
-            playerLegs[i] = new PlayerLeg(leg.LegName, PlayerLeg.State.Idle, leg.legGroup);
+            // Set legCopies interfaces
+            legCopies[i] = new LegCopy(leg.LegName, LegCopy.State.Idle, leg.legGroupName);
         }
     }
 
     void Update()
     {
+        // Calculate Urgency for each leg group
+        List<Leg> legs = new List<Leg>();
+        foreach (var leg in legs)
+        {
+
+        }
+
         if (GetGroundedLegs() < minGroundedLegs) return;
 
         // Collect eligible legs in the current group
         List<Leg> eligibleLegs = new List<Leg>();
         foreach (var leg in legs)
         {
-            if (!leg.IsMoving && leg.CalculateUrgency() >= 1f &&
-                leg.legGroup == (useGroupA ? Leg.LegGroup.GroupA : Leg.LegGroup.GroupB))
+            if (!leg.IsMoving &&
+                leg.CalculateUrgency() >= 1f &&
+                leg.legGroupName == (useGroupA ? "A" : "B")
+            )
             {
                 eligibleLegs.Add(leg);
             }
@@ -125,18 +137,18 @@ public class ProceduralLegAnimation : MonoBehaviour
         // Reset the leg state for the new active group
         foreach (Leg leg in legs)
         {
-            if (leg.legGroup == (useGroupA ? Leg.LegGroup.GroupA : Leg.LegGroup.GroupB))
+            if (leg.legGroupName == (useGroupA ? "A" : "B"))
             {
                 leg.ResetLegState();
             }
         }
 
-        // Reset the playerLegs states for the new active group
-        foreach (PlayerLeg playerLeg in playerLegs)
+        // Reset the legCopies states for the new active group
+        foreach (LegCopy playerLeg in legCopies)
         {
-            if (playerLeg.group == (useGroupA ? Leg.LegGroup.GroupA : Leg.LegGroup.GroupB))
+            if (playerLeg.groupName == (useGroupA ? "A" : "B"))
             {
-                playerLeg.SetState(PlayerLeg.State.Idle);
+                playerLeg.SetState(LegCopy.State.Idle);
                 playerLeg.hasMoved = false;
             }
         }
@@ -147,12 +159,12 @@ public class ProceduralLegAnimation : MonoBehaviour
     /// </summary>
     private void OnLegStartedMoving(Leg leg)
     {
-        // Find the this leg in the playerLegs list
-        for (int i = 0; i < playerLegs.Count; i++)
+        // Find the this leg in the legCopies list
+        for (int i = 0; i < legCopies.Count; i++)
         {
-            if (String.Equals(playerLegs[i].name, leg.LegName))
+            if (String.Equals(legCopies[i].name, leg.LegName))
             {
-                playerLegs[i].SetState(PlayerLeg.State.Moving);
+                legCopies[i].SetState(LegCopy.State.Moving);
             }
         }
     }
@@ -169,22 +181,22 @@ public class ProceduralLegAnimation : MonoBehaviour
         }
 
         bool allLegsInCurrentGroupDone = true;
-        // Find the this leg in the playerLegs list
-        for (int i = 0; i < playerLegs.Count; i++)
+        // Find the this leg in the legCopies list
+        for (int i = 0; i < legCopies.Count; i++)
         {
             // Check if the leg's state is not marked as 'Done Moving'
-            if (String.Equals(playerLegs[i].name, leg.LegName) && !playerLegs[i].IsDoneMoving())
+            if (String.Equals(legCopies[i].name, leg.LegName) && !legCopies[i].IsDoneMoving())
             {
-                playerLegs[i].SetState(PlayerLeg.State.DoneMoving);
-                playerLegs[i].hasMoved = true;
-                Debug.Log(playerLegs[i].GetState().ToString());
+                legCopies[i].SetState(LegCopy.State.DoneMoving);
+                legCopies[i].hasMoved = true;
+                Debug.Log(legCopies[i].GetState().ToString());
             }
 
             // Find all the legs in the same group as the leg that has called this event
             // And check if they have all completed as well
-            if (playerLegs[i].group == leg.legGroup && !playerLegs[i].hasMoved)
+            if (legCopies[i].groupName == leg.legGroupName && !legCopies[i].hasMoved)
             {
-                Debug.Log(playerLegs[i].group.ToString());
+                Debug.Log(legCopies[i].groupName);
 
                 allLegsInCurrentGroupDone = false;
             }
@@ -218,8 +230,9 @@ public class ProceduralLegAnimation : MonoBehaviour
             else if (legs[i].IsDone) legStatus = "Done";
             else legStatus = "Not Started";
 
-            GUILayout.Label($"Leg {i} ({legs[i].legGroup})", style);
+            GUILayout.Label($"Leg {i} ({legs[i].legGroupName})", style);
             GUILayout.Label($"Status: {legStatus}", style);
+            GUILayout.Label($"Urgency: {legs[i].CalculateUrgency()}", style);
             GUILayout.Space(5);
         }
 
