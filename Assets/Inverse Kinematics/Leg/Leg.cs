@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 
+[Serializable]
 public class Leg : MonoBehaviour
 {
     #region Inspector Fields

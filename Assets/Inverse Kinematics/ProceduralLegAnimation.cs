@@ -2,39 +2,6 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-[System.Serializable]
-public class PlayerLeg
-{
-    public enum State { Idle, Moving, DoneMoving }
-
-    public string name;
-    public State currentState;
-    public Leg.LegGroup group;
-    public bool hasMoved = false;
-
-    public PlayerLeg(string legName, State state, Leg.LegGroup legGroup)
-    {
-        name = legName;
-        currentState = state;
-        group = legGroup;
-    }
-
-    public void SetState(State s)
-    {
-        currentState = s;
-    }
-
-    public State GetState()
-    {
-        return currentState;
-    }
-
-    public bool IsDoneMoving()
-    {
-        return currentState == State.DoneMoving;
-    }
-}
-
 public class ProceduralLegAnimation : MonoBehaviour
 {
     [Header("Terrain Settings")]
@@ -49,7 +16,8 @@ public class ProceduralLegAnimation : MonoBehaviour
     [Header("Legs")]
     [SerializeField] private List<Leg> legs = new List<Leg>();
 
-    [SerializeField] private List<PlayerLeg> playerLegs = new List<PlayerLeg>();
+    // TODO: Replace playerLegs with new state system
+    //[SerializeField] private List<PlayerLeg> playerLegs = new List<PlayerLeg>();
 
     [Header("Concurrency")]
     [SerializeField] private int maxConcurrentMoves = 2; // Set this in Inspector
@@ -89,8 +57,9 @@ public class ProceduralLegAnimation : MonoBehaviour
             leg.OnLegMovementStarted += OnLegStartedMoving;
             leg.OnLegMovementFinished += OnLegDoneMoving;
 
+            // TODO: Replace playerLegs with new state system
             // Set playerLegs interfaces
-            playerLegs[i] = new PlayerLeg(leg.LegName, PlayerLeg.State.Idle, leg.legGroup);
+            //playerLegs[i] = new PlayerLeg(leg.LegName, PlayerLeg.State.Idle, leg.legGroup);
         }
     }
 
@@ -135,15 +104,16 @@ public class ProceduralLegAnimation : MonoBehaviour
             }
         }
 
+        // TODO: Replace playerLegs with new state system
         // Reset the playerLegs states for the new active group
-        foreach (PlayerLeg playerLeg in playerLegs)
+        /*foreach (PlayerLeg playerLeg in playerLegs)
         {
             if (playerLeg.group == (useGroupA ? Leg.LegGroup.GroupA : Leg.LegGroup.GroupB))
             {
                 playerLeg.SetState(PlayerLeg.State.Idle);
                 playerLeg.hasMoved = false;
             }
-        }
+        }*/
     }
 
     /// <summary>
@@ -151,14 +121,15 @@ public class ProceduralLegAnimation : MonoBehaviour
     /// </summary>
     private void OnLegStartedMoving(Leg leg)
     {
+        // TODO: Replace playerLegs with new state system
         // Find the this leg in the playerLegs list
-        for (int i = 0; i < playerLegs.Count; i++)
+        /*for (int i = 0; i < playerLegs.Count; i++)
         {
             if (String.Equals(playerLegs[i].name, leg.LegName))
             {
                 playerLegs[i].SetState(PlayerLeg.State.Moving);
             }
-        }
+        }*/
     }
 
     /// <summary>
@@ -173,8 +144,10 @@ public class ProceduralLegAnimation : MonoBehaviour
         }
 
         bool allLegsInCurrentGroupDone = true;
+
+        // TODO: Replace playerLegs with new state system
         // Find the this leg in the playerLegs list
-        for (int i = 0; i < playerLegs.Count; i++)
+        /*for (int i = 0; i < playerLegs.Count; i++)
         {
             // Check if the leg's state is not marked as 'Done Moving'
             if (String.Equals(playerLegs[i].name, leg.LegName) && !playerLegs[i].IsDoneMoving())
@@ -192,7 +165,7 @@ public class ProceduralLegAnimation : MonoBehaviour
 
                 allLegsInCurrentGroupDone = false;
             }
-        }
+        }*/
 
         if (allLegsInCurrentGroupDone) SwitchActiveGroup();
     }
