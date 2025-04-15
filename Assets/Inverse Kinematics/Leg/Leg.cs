@@ -31,7 +31,6 @@ public class Leg : MonoBehaviour
     private Vector3 newPosition;
     private Vector3 currentPosition;
     private float moveTimer = 0f;
-    private int movesToPerform = 0;
     private float distanceMoved = 0f;
     [SerializeField] private float currentRotation = 0f;
     [SerializeField] private float rotationAmount = 0f;
@@ -72,13 +71,6 @@ public class Leg : MonoBehaviour
     */
 
     public float MoveTimer => moveTimer;
-
-    // MovesToPerform as a standard property
-    public int MovesToPerform
-    {
-        get => movesToPerform;
-        set => movesToPerform = value;
-    }
 
     // StartMoveTime can be a simple auto-property or standard property
     public float StartMoveTime { get; set; }
