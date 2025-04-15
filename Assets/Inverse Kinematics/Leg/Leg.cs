@@ -64,12 +64,6 @@ public class Leg : MonoBehaviour
     // Readonly properties for external checks
     public string LegName => legName;
 
-    // TODO: Implement new state based system
-    /*
-    public bool IsMoving => isMoving;
-    public bool IsDone => isDone;
-    */
-
     public float MoveTimer => moveTimer;
 
     // StartMoveTime can be a simple auto-property or standard property
@@ -99,8 +93,8 @@ public class Leg : MonoBehaviour
         // footOffset = transform.localPosition;
 
         // TODO: Implement new state based system
-        //isMoving = false;
-        //isDone = false;
+        currentLegState = IdleState;
+        currentLegState.EnterState(this);
 
         moveTimer = 1f;
         if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, 30, terrainLayer))
@@ -116,16 +110,23 @@ public class Leg : MonoBehaviour
         UpdatePositionToMove(); // Update target position every frame
 
         // TODO: Implement new state based system
+        currentLegState.Update(this);
+
+        // Update rotation tracking
+        rotationAmount = Mathf.Abs(body.transform.eulerAngles.y - currentRotation);
+        transform.position = currentPosition;
+    }
+
+    void FixedUpdate()
+    {
+        currentLegState.FixedUpdate(this);
+
         /*
         if (isMoving)
         {
             UpdateMove(); // Continue moving if already in motion
         }
         */
-
-        // Update rotation tracking
-        rotationAmount = Mathf.Abs(body.transform.eulerAngles.y - currentRotation);
-        transform.position = currentPosition;
     }
 
     private void UpdatePositionToMove()
@@ -146,17 +147,18 @@ public class Leg : MonoBehaviour
         newPosition = targetPosition;
 
         // TODO: Implement new state based system
-        /*
-        isMoving = true;
-        isDone = false;
-        */
+        // Exit Idle State
+        currentLegState.ExitState(this);
+        currentLegState = MoveState;
+        // Enter Move State
+        currentLegState.EnterState(this);
 
         moveTimer = 0f; // Reset timer
         OnLegMovementStarted?.Invoke(this); // Started moving notification to the system
         // currentRotation = body.transform.eulerAngles.y;  // Reset rotation
     }
 
-    private void UpdateMove()
+    public void UpdateMove()
     {
         if (moveTimer < moveDuration)
         {
@@ -174,15 +176,15 @@ public class Leg : MonoBehaviour
             oldPosition = newPosition;
 
             // TODO: Implement new state based system
-            /*
-            isMoving = false;
-            isDone = true;
-            */
+            // Exit from Move State
+            currentLegState.ExitState(this);
+            currentLegState = IdleState;
+            // Enter Idle State
+            currentLegState.EnterState(this);
 
             OnLegMovementFinished?.Invoke(this); // Finished moving notification to the system
             // proceduralLegAnimation.NotifyLegMovementComplete(this);
             currentRotation = body.transform.eulerAngles.y;  // Reset rotation
-
         }
     }
 
@@ -216,10 +218,11 @@ public class Leg : MonoBehaviour
     public void ResetLegState()
     {
         // TODO: Implement new state based system
-        /*
-        isMoving = false;
-        isDone = false;
-        */
+        // Exit from Any State
+        currentLegState.ExitState(this);
+        currentLegState = IdleState;
+        // Enter Idle State
+        currentLegState.EnterState(this);
 
         moveTimer = 1f;  // Reset to what you consider as the "default" state
     }

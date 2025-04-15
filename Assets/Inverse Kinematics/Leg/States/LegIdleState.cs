@@ -13,12 +13,12 @@ public class LegIdleState : LegBaseState
         Debug.Log("Leg exiting Idle state: " + leg.legName);
     }
 
-    public override void FixedUpdateState(Leg leg)
+    public override void FixedUpdate(Leg leg)
     {
 
     }
 
-    public override void UpdateState(Leg leg)
+    public override void Update(Leg leg)
     {
 
     }

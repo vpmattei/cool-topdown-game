@@ -7,7 +7,7 @@ public abstract class LegBaseState
 
     public abstract void ExitState(Leg leg);
 
-    public abstract void FixedUpdateState(Leg leg);
+    public abstract void FixedUpdate(Leg leg);
 
-    public abstract void UpdateState(Leg leg);
+    public abstract void Update(Leg leg);
 }
