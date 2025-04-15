@@ -7,6 +7,12 @@ public class Leg : MonoBehaviour
 
     [Header("Basic Leg Info")]
     public string legName;
+
+    // Leg State
+    public LegBaseState currentLegState;
+    public LegIdleState IdleState = new LegIdleState();
+    public LegMoveState MoveState = new LegMoveState();
+
     [SerializeField] private AnimationCurve stepCurve;
     [SerializeField] private LayerMask terrainLayer;
     public enum LegGroup { GroupA, GroupB }
@@ -25,8 +31,6 @@ public class Leg : MonoBehaviour
     private Vector3 newPosition;
     private Vector3 currentPosition;
     private float moveTimer = 0f;
-    private bool isMoving = false;
-    private bool isDone = false;
     private int movesToPerform = 0;
     private float distanceMoved = 0f;
     [SerializeField] private float currentRotation = 0f;
@@ -60,8 +64,13 @@ public class Leg : MonoBehaviour
 
     // Readonly properties for external checks
     public string LegName => legName;
+
+    // TODO: Implement new state based system
+    /*
     public bool IsMoving => isMoving;
     public bool IsDone => isDone;
+    */
+
     public float MoveTimer => moveTimer;
 
     // MovesToPerform as a standard property
@@ -96,8 +105,11 @@ public class Leg : MonoBehaviour
         proceduralLegAnimation = body?.GetComponent<ProceduralLegAnimation>();
         playerController = body?.GetComponent<PlayerController>();
         // footOffset = transform.localPosition;
-        isMoving = false;
-        isDone = false;
+
+        // TODO: Implement new state based system
+        //isMoving = false;
+        //isDone = false;
+
         moveTimer = 1f;
         if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, 30, terrainLayer))
         {
@@ -111,10 +123,13 @@ public class Leg : MonoBehaviour
     {
         UpdatePositionToMove(); // Update target position every frame
 
+        // TODO: Implement new state based system
+        /*
         if (isMoving)
         {
             UpdateMove(); // Continue moving if already in motion
         }
+        */
 
         // Update rotation tracking
         rotationAmount = Mathf.Abs(body.transform.eulerAngles.y - currentRotation);
@@ -137,8 +152,13 @@ public class Leg : MonoBehaviour
     {
         oldPosition = currentPosition;
         newPosition = targetPosition;
+
+        // TODO: Implement new state based system
+        /*
         isMoving = true;
         isDone = false;
+        */
+
         moveTimer = 0f; // Reset timer
         OnLegMovementStarted?.Invoke(this); // Started moving notification to the system
         // currentRotation = body.transform.eulerAngles.y;  // Reset rotation
@@ -160,8 +180,13 @@ public class Leg : MonoBehaviour
             // Movement complete
             currentPosition = newPosition;
             oldPosition = newPosition;
+
+            // TODO: Implement new state based system
+            /*
             isMoving = false;
             isDone = true;
+            */
+
             OnLegMovementFinished?.Invoke(this); // Finished moving notification to the system
             // proceduralLegAnimation.NotifyLegMovementComplete(this);
             currentRotation = body.transform.eulerAngles.y;  // Reset rotation
@@ -198,8 +223,12 @@ public class Leg : MonoBehaviour
 
     public void ResetLegState()
     {
+        // TODO: Implement new state based system
+        /*
         isMoving = false;
         isDone = false;
+        */
+
         moveTimer = 1f;  // Reset to what you consider as the "default" state
     }
 
