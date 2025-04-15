@@ -70,7 +70,6 @@ public class ProceduralLegAnimation : MonoBehaviour
         int grounded = 0;
         foreach (var leg in legs)
         {
-            // TODO: Implement new state based system
             if (leg.currentLegState == leg.IdleState)
             {
                 grounded++;
@@ -103,7 +102,6 @@ public class ProceduralLegAnimation : MonoBehaviour
         List<Leg> eligibleLegs = new List<Leg>();
         foreach (var leg in legs)
         {
-            // TODO: Implement new state based system
             if (leg.currentLegState == leg.IdleState && leg.CalculateUrgency() >= 1f &&
                 leg.legGroup == (useGroupA ? Leg.LegGroup.GroupA : Leg.LegGroup.GroupB))
             {
@@ -199,6 +197,12 @@ public class ProceduralLegAnimation : MonoBehaviour
         if (allLegsInCurrentGroupDone) SwitchActiveGroup();
     }
 
+    private float CalculateLegGroupUrgency()
+    {
+        
+        return 0f;
+    }
+
     private void OnGUI()
     {
         GUIStyle style = new GUIStyle(GUI.skin.label)
@@ -221,17 +225,10 @@ public class ProceduralLegAnimation : MonoBehaviour
         {
             string legStatus;
 
-            // TODO: Implement new state based system
             if (legs[i].currentLegState == legs[i].MoveState) legStatus = "Moving";
             else legStatus = "Idle";
-            /*
-            if (legs[i].IsMoving) legStatus = "Moving";
-            else if (legs[i].IsDone) legStatus = "Done";
-            else legStatus = "Not Started";
-            */
 
             GUILayout.Label($"Leg {i} ({legs[i].legGroup})", style);
-            // TODO: Implement new state based system
             GUILayout.Label($"Status: {legStatus}", style);
             GUILayout.Space(5);
         }

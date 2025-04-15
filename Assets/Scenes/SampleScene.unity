@@ -451,9 +451,9 @@ MonoBehaviour:
   stepDistance: 2
   maxRotation: 45
   velocityFactor: 0
-  moveDuration: 0.25
+  moveDuration: 1
   stepHeight: 2
-  legInterval: 0.125
+  legInterval: 0.5
 --- !u!65 &211326311
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -605,9 +605,9 @@ MonoBehaviour:
   stepDistance: 2
   maxRotation: 45
   velocityFactor: 0
-  moveDuration: 0.25
+  moveDuration: 1
   stepHeight: 2
-  legInterval: 0.125
+  legInterval: 0.5
 --- !u!65 &226724074
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1062,9 +1062,9 @@ MonoBehaviour:
   stepDistance: 2
   maxRotation: 45
   velocityFactor: 0
-  moveDuration: 0.25
+  moveDuration: 1
   stepHeight: 2
-  legInterval: 0.125
+  legInterval: 0.5
 --- !u!65 &332148494
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -4157,9 +4157,9 @@ MonoBehaviour:
   stepDistance: 2
   maxRotation: 45
   velocityFactor: 0
-  moveDuration: 0.25
+  moveDuration: 1
   stepHeight: 2
-  legInterval: 0.125
+  legInterval: 0.5
 --- !u!65 &2133888485
 BoxCollider:
   m_ObjectHideFlags: 0

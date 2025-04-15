@@ -30,7 +30,7 @@ public class Leg : MonoBehaviour
     private Vector3 oldPosition;
     private Vector3 newPosition;
     private Vector3 currentPosition;
-    private float moveTimer = 0f;
+    private float moveTimer = 0f;   // Timer that increments each frame, after the movement of the leg starts, moveTimer = [0 ... moveDuration]
     private float distanceMoved = 0f;
     [SerializeField] private float currentRotation = 0f;
     [SerializeField] private float rotationAmount = 0f;
@@ -41,15 +41,12 @@ public class Leg : MonoBehaviour
     #endregion
 
     #region Movement Settings
-
     [SerializeField] private float stepDistance = 2f;   // The threshold after which movement should start
     [SerializeField] private float maxRotation = .15f;   // The rotation threshold after which movement should start
     [SerializeField] private float velocityFactor = 1f;   // Velocity factor that adds distance to the step distance
     [SerializeField] private float moveDuration = 0.25f; // How long each leg moves
     [SerializeField] private float stepHeight = 2f;     // How high each leg goes
     [SerializeField] private float legInterval = 0.125f; // Time interval between legs starting movement
-    [Tooltip("Leg index that indicates at which order this leg will move (0 is first, 1 is second and so on...)")]
-
     #endregion
 
     #region Events
@@ -92,7 +89,6 @@ public class Leg : MonoBehaviour
         playerController = body?.GetComponent<PlayerController>();
         // footOffset = transform.localPosition;
 
-        // TODO: Implement new state based system
         currentLegState = IdleState;
         currentLegState.EnterState(this);
 
@@ -109,7 +105,6 @@ public class Leg : MonoBehaviour
     {
         UpdatePositionToMove(); // Update target position every frame
 
-        // TODO: Implement new state based system
         currentLegState.Update(this);
 
         // Update rotation tracking
@@ -120,13 +115,6 @@ public class Leg : MonoBehaviour
     void FixedUpdate()
     {
         currentLegState.FixedUpdate(this);
-
-        /*
-        if (isMoving)
-        {
-            UpdateMove(); // Continue moving if already in motion
-        }
-        */
     }
 
     private void UpdatePositionToMove()
@@ -146,7 +134,6 @@ public class Leg : MonoBehaviour
         oldPosition = currentPosition;
         newPosition = targetPosition;
 
-        // TODO: Implement new state based system
         // Exit Idle State
         currentLegState.ExitState(this);
         currentLegState = MoveState;
@@ -175,7 +162,6 @@ public class Leg : MonoBehaviour
             currentPosition = newPosition;
             oldPosition = newPosition;
 
-            // TODO: Implement new state based system
             // Exit from Move State
             currentLegState.ExitState(this);
             currentLegState = IdleState;
@@ -198,6 +184,7 @@ public class Leg : MonoBehaviour
         return Mathf.Clamp01(distanceUrgency + rotationUrgency * 0.1f);
     }
 
+    [Obsolete]
     private Vector3 PredictStepPosition(Vector3 oldHitPoint, Vector3 newHitPoint, Vector3 bodyVelocity, float velocityFactor)
     {
         // 1. Get the base direction (from oldHit to newHit)
@@ -217,7 +204,6 @@ public class Leg : MonoBehaviour
 
     public void ResetLegState()
     {
-        // TODO: Implement new state based system
         // Exit from Any State
         currentLegState.ExitState(this);
         currentLegState = IdleState;
