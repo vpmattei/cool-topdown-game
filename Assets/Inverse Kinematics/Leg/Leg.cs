@@ -16,12 +16,15 @@ public class Leg : MonoBehaviour
 
     [SerializeField] private AnimationCurve stepCurve;
     [SerializeField] private LayerMask terrainLayer;
-    public enum LegGroup { GroupA, GroupB }
-    public LegGroup legGroup; // Assign in Inspector
 
     [Header("References")]
     public GameObject body;
     public Vector3 footOffset;
+
+    [Header("Group Selection")]
+    // This int stores the index of the group this leg belongs to.
+    [LegGroupDropdown]
+    public int selectedGroupIndex;
 
     #endregion
 
@@ -36,7 +39,8 @@ public class Leg : MonoBehaviour
     [SerializeField] private float currentRotation = 0f;
     [SerializeField] private float rotationAmount = 0f;
 
-    private ProceduralLegAnimation proceduralLegAnimation;
+    private LegsManager legsManager;
+    public LegsManager LegsManager => legsManager;
     private PlayerController playerController;
 
     #endregion
@@ -86,7 +90,7 @@ public class Leg : MonoBehaviour
     void Start()
     {
         // body = transform.parent.gameObject;
-        proceduralLegAnimation = body?.GetComponent<ProceduralLegAnimation>();
+        legsManager = body?.GetComponent<LegsManager>();
         playerController = body?.GetComponent<PlayerController>();
         // footOffset = transform.localPosition;
 
@@ -170,8 +174,27 @@ public class Leg : MonoBehaviour
             currentLegState.EnterState(this);
 
             OnLegMovementFinished?.Invoke(this); // Finished moving notification to the system
-            // proceduralLegAnimation.NotifyLegMovementComplete(this);
+            // LegsManager.NotifyLegMovementComplete(this);
             currentRotation = body.transform.eulerAngles.y;  // Reset rotation
+        }
+    }
+
+    /// <summary>
+    /// The actual name of the group this leg belongs to,
+    /// looked up from the manager’s list.
+    /// </summary>
+    public string SelectedGroupName
+    {
+        get
+        {
+            if (legsManager == null
+                || legsManager.legGroups == null
+                || selectedGroupIndex < 0
+                || selectedGroupIndex >= legsManager.legGroups.Count)
+            {
+                return string.Empty;
+            }
+            return legsManager.legGroups[selectedGroupIndex];
         }
     }
 

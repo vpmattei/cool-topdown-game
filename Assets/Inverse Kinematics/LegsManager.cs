@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ProceduralLegAnimation : MonoBehaviour
+public class LegsManager : MonoBehaviour
 {
     [Header("Terrain Settings")]
     [SerializeField] private LayerMask terrainLayer;
@@ -12,6 +12,14 @@ public class ProceduralLegAnimation : MonoBehaviour
     [SerializeField] private float moveDuration = 2f;    // How long each leg moves
     [SerializeField] private float stepHeight = 4f;      // How high each leg goes
     [SerializeField] private float legInterval = 1f;     // Time interval between legs starting movement
+
+    [Header("Leg Group Settings")]
+    [Tooltip("Define the group names available for the legs.")]
+    public List<string> legGroups = new List<string>();
+    // TODO: Implement new currentActiveLegGroup logic
+    private string currentActiveLegGroup = null;
+    //private bool useGroupA = true;
+
 
     [Header("Legs")]
     [SerializeField] private List<Leg> legs = new List<Leg>();
@@ -26,7 +34,6 @@ public class ProceduralLegAnimation : MonoBehaviour
     [Header("Stability")]
     [SerializeField] private int minGroundedLegs = 2;
 
-    private bool useGroupA = true;
 
     // [Header("Separate Start Times")]
     // [SerializeField] private bool useSeparateStartTimes = false;
@@ -65,18 +72,29 @@ public class ProceduralLegAnimation : MonoBehaviour
 
     void Update()
     {
+        // TODO: Update the current active leg group based on the overall urgency of the group
+
+        // If we don't have the minimum amount of legs grounded, don't bother moving any more extra legs, so we return
         if (GetGroundedLegs() < minGroundedLegs) return;
 
+        // TODO: Then for each leg of the current active leg group, move a leg if they have surpassed the urgency limit = 1
+
         // Collect eligible legs in the current group
+        /*
         List<Leg> eligibleLegs = new List<Leg>();
         foreach (var leg in legs)
         {
+            // For each leg, we first
+            // Check if they are idle
+            // Then if they have an urgency >= 1 
+            // Then if the current active group is the one from the leg 
             if (leg.currentLegState == leg.IdleState && leg.CalculateUrgency() >= 1f &&
-                leg.legGroup == (useGroupA ? Leg.LegGroup.GroupA : Leg.LegGroup.GroupB))
+                leg.SelectedGroupName == (useGroupA ? Leg.LegGroup.GroupA : Leg.LegGroup.GroupB))
             {
                 eligibleLegs.Add(leg);
             }
         }
+        */
 
         eligibleLegs.Sort((a, b) => b.CalculateUrgency().CompareTo(a.CalculateUrgency()));
 
@@ -143,7 +161,7 @@ public class ProceduralLegAnimation : MonoBehaviour
             activeMovingLegs.Remove(leg);
         }
 
-        bool allLegsInCurrentGroupDone = true;
+        //bool allLegsInCurrentGroupDone = true;
 
         // TODO: Replace playerLegs with new state system
         // Find the this leg in the playerLegs list
@@ -167,12 +185,12 @@ public class ProceduralLegAnimation : MonoBehaviour
             }
         }*/
 
-        if (allLegsInCurrentGroupDone) SwitchActiveGroup();
+        //if (allLegsInCurrentGroupDone) SwitchActiveGroup();
     }
 
     private float CalculateLegGroupUrgency()
     {
-        
+
         return 0f;
     }
 
