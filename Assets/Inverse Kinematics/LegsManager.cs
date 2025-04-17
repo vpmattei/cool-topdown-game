@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class LegsManager : MonoBehaviour
@@ -16,8 +17,10 @@ public class LegsManager : MonoBehaviour
     [Header("Leg Group Settings")]
     [Tooltip("Define the group names available for the legs.")]
     public List<string> legGroups = new List<string>();
-    // TODO: Implement new currentActiveLegGroup logic
-    private string currentActiveLegGroup = null;
+    // TODO: Create legGroupUrgency for each legGroup
+    private List<float> legGroupUrgency;
+    // TODO: Implement new mostUrgentLegGroup logic
+    private string mostUrgentLegGroup = null;
     //private bool useGroupA = true;
 
 
@@ -39,23 +42,13 @@ public class LegsManager : MonoBehaviour
     // [SerializeField] private bool useSeparateStartTimes = false;
     // [SerializeField] private List<float> separateStartTimes = new List<float>();    // Make sure separateStartTimes matches legs.Count if useSeparateStartTimes is true
 
-
-    private int GetGroundedLegs()
-    {
-        int grounded = 0;
-        foreach (var leg in legs)
-        {
-            if (leg.currentLegState == leg.IdleState)
-            {
-                grounded++;
-            }
-            //if (!leg.IsMoving) grounded++;
-        }
-        return grounded;
-    }
-
     void Start()
     {
+        // Set the current active leg group to first in the list
+        mostUrgentLegGroup = legGroups[0];
+        
+        // Define the size of the legGroupUrgency List
+        legGroupUrgency = new List<float>(legGroups.Count);
 
         // Subscribe to each leg's OnLegMovementStarted and OnLegMovementFinished event
         for (int i = 0; i < legs.Count; i++)
@@ -72,7 +65,11 @@ public class LegsManager : MonoBehaviour
 
     void Update()
     {
+        // TODO: Update every leg group urgency
+        UpdateLegGroupUrgency();
+
         // TODO: Update the current active leg group based on the overall urgency of the group
+        mostUrgentLegGroup = MostUrgentLegGroup;
 
         // If we don't have the minimum amount of legs grounded, don't bother moving any more extra legs, so we return
         if (GetGroundedLegs() < minGroundedLegs) return;
@@ -107,6 +104,20 @@ public class LegsManager : MonoBehaviour
                 activeMovingLegs.Add(leg);
             }
         }
+    }
+
+    private int GetGroundedLegs()
+    {
+        int grounded = 0;
+        foreach (var leg in legs)
+        {
+            if (leg.currentLegState == leg.IdleState)
+            {
+                grounded++;
+            }
+            //if (!leg.IsMoving) grounded++;
+        }
+        return grounded;
     }
 
     private void SwitchActiveGroup()
@@ -188,10 +199,48 @@ public class LegsManager : MonoBehaviour
         //if (allLegsInCurrentGroupDone) SwitchActiveGroup();
     }
 
-    private float CalculateLegGroupUrgency()
+    private void UpdateLegGroupUrgency()
     {
+        int index = 0;
 
-        return 0f;
+        foreach (string legGroupUrgencyToUpdate in legGroups)
+        {
+            float groupUrgency = 0;
+
+            foreach (Leg leg in legs)
+            {
+                if (leg.SelectedGroupName == legGroupUrgencyToUpdate)
+                {
+                    groupUrgency += leg.CalculateUrgency();
+                }
+            }
+
+            legGroupUrgency[index] = groupUrgency;
+            index++;
+        }
+    }
+
+    private string MostUrgentLegGroup
+    {
+        get
+        {
+            string mostUrgentLegGroup = null;
+            float groupUrgency = 0;
+
+            int i = 0;
+            foreach (float legGrUcy in legGroupUrgency)
+            {
+                if (groupUrgency <= legGrUcy)
+                {
+                    groupUrgency = legGrUcy;
+
+                    mostUrgentLegGroup = legGroups[i];
+                }
+                i++;
+            }
+
+            return mostUrgentLegGroup;
+        }
     }
 
     private void OnGUI()
