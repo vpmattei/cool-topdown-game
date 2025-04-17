@@ -161,28 +161,15 @@ MonoBehaviour:
   moveDuration: 0.25
   stepHeight: 2
   legInterval: 0.125
+  legGroups:
+  - A
+  - B
+  - C
   legs:
   - {fileID: 2133888484}
   - {fileID: 211326310}
   - {fileID: 332148493}
   - {fileID: 226724073}
-  playerLegs:
-  - name: 
-    currentState: 0
-    group: 0
-    hasMoved: 0
-  - name: 
-    currentState: 0
-    group: 0
-    hasMoved: 0
-  - name: 
-    currentState: 0
-    group: 0
-    hasMoved: 0
-  - name: 
-    currentState: 0
-    group: 0
-    hasMoved: 0
   maxConcurrentMoves: 2
   minGroundedLegs: 2
 --- !u!4 &131292816
@@ -4404,10 +4391,10 @@ MonoBehaviour:
   moveDuration: 0.1
   stepHeight: 0.4
   legInterval: 0.05
+  legGroups: []
   legs:
   - {fileID: 2112414688}
   - {fileID: 1637659430}
-  playerLegs: []
   maxConcurrentMoves: 2
   minGroundedLegs: 3
 --- !u!1001 &2409866795236810007
