@@ -39,7 +39,7 @@ public class Leg : MonoBehaviour
     [SerializeField] private float currentRotation = 0f;
     [SerializeField] private float rotationAmount = 0f;
 
-    private LegsManager legsManager;
+    [SerializeField] private LegsManager legsManager;
     public LegsManager LegsManager => legsManager;
     private PlayerController playerController;
 

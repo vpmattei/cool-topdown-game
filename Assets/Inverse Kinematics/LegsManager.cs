@@ -91,7 +91,6 @@ public class LegsManager : MonoBehaviour
                 eligibleLegs.Add(leg);
             }
         }
-        */
 
         eligibleLegs.Sort((a, b) => b.CalculateUrgency().CompareTo(a.CalculateUrgency()));
 
@@ -104,6 +103,7 @@ public class LegsManager : MonoBehaviour
                 activeMovingLegs.Add(leg);
             }
         }
+        */
     }
 
     private int GetGroundedLegs()
@@ -120,11 +120,14 @@ public class LegsManager : MonoBehaviour
         return grounded;
     }
 
+
+    // TODO: Remove this deprecated method
     private void SwitchActiveGroup()
     {
-        useGroupA = !useGroupA;
+        //useGroupA = !useGroupA;
 
         // Reset the leg state for the new active group
+        /*
         foreach (Leg leg in legs)
         {
             if (leg.legGroup == (useGroupA ? Leg.LegGroup.GroupA : Leg.LegGroup.GroupB))
@@ -132,6 +135,7 @@ public class LegsManager : MonoBehaviour
                 leg.ResetLegState();
             }
         }
+        */
 
         // TODO: Replace playerLegs with new state system
         // Reset the playerLegs states for the new active group
@@ -255,8 +259,8 @@ public class LegsManager : MonoBehaviour
 
         // Add group priority display
         GUILayout.Label("Group Priority:", style);
-        GUILayout.Label($"Group A: {(useGroupA ? "Priority" : "---")}", style);
-        GUILayout.Label($"Group B: {(!useGroupA ? "Priority" : "---")}", style);
+        GUILayout.Label($"Group A: {(legGroupUrgency[0] >= 2 ? "PRIORITY" : legGroupUrgency[0])}", style);
+        GUILayout.Label($"Group B: {(legGroupUrgency[1] >= 2 ? "PRIORITY" : legGroupUrgency[1])}", style);
 
         GUILayout.Space(10);
         GUILayout.Label("Leg States:", style);
@@ -268,7 +272,7 @@ public class LegsManager : MonoBehaviour
             if (legs[i].currentLegState == legs[i].MoveState) legStatus = "Moving";
             else legStatus = "Idle";
 
-            GUILayout.Label($"Leg {i} ({legs[i].legGroup})", style);
+            GUILayout.Label($"Leg {i} ({legGroupUrgency[legs[i].selectedGroupIndex]})", style);
             GUILayout.Label($"Status: {legStatus}", style);
             GUILayout.Space(5);
         }
