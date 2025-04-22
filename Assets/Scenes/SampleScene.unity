@@ -171,7 +171,7 @@ MonoBehaviour:
   - {fileID: 332148493}
   - {fileID: 226724073}
   maxConcurrentMoves: 2
-  minGroundedLegs: 2
+  minGroundedLegs: 3
 --- !u!4 &131292816
 Transform:
   m_ObjectHideFlags: 0
@@ -430,17 +430,18 @@ MonoBehaviour:
   terrainLayer:
     serializedVersion: 2
     m_Bits: 8
-  legGroup: 0
   body: {fileID: 131292814}
   footOffset: {x: 1, y: 0.15, z: 0}
+  selectedGroupIndex: 0
   currentRotation: 0
   rotationAmount: 0
+  legsManager: {fileID: 131292815}
   stepDistance: 2
   maxRotation: 45
   velocityFactor: 0
-  moveDuration: 1
+  moveDuration: 0.25
   stepHeight: 2
-  legInterval: 0.5
+  legInterval: 0.125
 --- !u!65 &211326311
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -584,17 +585,18 @@ MonoBehaviour:
   terrainLayer:
     serializedVersion: 2
     m_Bits: 8
-  legGroup: 1
   body: {fileID: 131292814}
   footOffset: {x: 0, y: 0.15, z: -1}
+  selectedGroupIndex: 1
   currentRotation: 0
   rotationAmount: 0
+  legsManager: {fileID: 131292815}
   stepDistance: 2
   maxRotation: 45
   velocityFactor: 0
-  moveDuration: 1
+  moveDuration: 0.25
   stepHeight: 2
-  legInterval: 0.5
+  legInterval: 0.125
 --- !u!65 &226724074
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -882,7 +884,7 @@ Camera:
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 60.000004
-  orthographic: 0
+  orthographic: 1
   orthographic size: 5
   m_Depth: -1
   m_CullingMask:
@@ -1041,17 +1043,18 @@ MonoBehaviour:
   terrainLayer:
     serializedVersion: 2
     m_Bits: 8
-  legGroup: 1
   body: {fileID: 131292814}
   footOffset: {x: 0, y: 0.15, z: 1}
+  selectedGroupIndex: 1
   currentRotation: 0
   rotationAmount: 0
+  legsManager: {fileID: 131292815}
   stepDistance: 2
   maxRotation: 45
   velocityFactor: 0
-  moveDuration: 1
+  moveDuration: 0.25
   stepHeight: 2
-  legInterval: 0.5
+  legInterval: 0.125
 --- !u!65 &332148494
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -3821,11 +3824,12 @@ MonoBehaviour:
   terrainLayer:
     serializedVersion: 2
     m_Bits: 8
-  legGroup: 0
   body: {fileID: 1030121315}
   footOffset: {x: 0, y: 0, z: 0}
+  selectedGroupIndex: 0
   currentRotation: 0
   rotationAmount: 0
+  legsManager: {fileID: 0}
   stepDistance: 2
   maxRotation: 15
   velocityFactor: 1
@@ -4056,11 +4060,12 @@ MonoBehaviour:
   terrainLayer:
     serializedVersion: 2
     m_Bits: 8
-  legGroup: 0
   body: {fileID: 1030121315}
   footOffset: {x: 0, y: 0, z: 0}
+  selectedGroupIndex: 0
   currentRotation: 0
   rotationAmount: 0
+  legsManager: {fileID: 0}
   stepDistance: 2
   maxRotation: 15
   velocityFactor: 1
@@ -4136,17 +4141,18 @@ MonoBehaviour:
   terrainLayer:
     serializedVersion: 2
     m_Bits: 8
-  legGroup: 0
   body: {fileID: 131292814}
   footOffset: {x: 0, y: 0.15, z: 0}
+  selectedGroupIndex: 0
   currentRotation: 0
   rotationAmount: 0
+  legsManager: {fileID: 131292815}
   stepDistance: 2
   maxRotation: 45
   velocityFactor: 0
-  moveDuration: 1
+  moveDuration: 0.25
   stepHeight: 2
-  legInterval: 0.5
+  legInterval: 0.125
 --- !u!65 &2133888485
 BoxCollider:
   m_ObjectHideFlags: 0
