@@ -114,7 +114,7 @@ public class Leg : MonoBehaviour
 
         // Update rotation tracking
         rotationAmount = Mathf.Abs(body.transform.eulerAngles.y - currentRotation);
-        transform.position = currentPosition; // TODO: Update only in move state
+        //transform.position = currentPosition; // TODO: Update only in move state
     }
 
     void FixedUpdate()
@@ -212,7 +212,7 @@ public class Leg : MonoBehaviour
         }
     }
 
-    [Obsolete]
+    // TODO Fix this method
     private Vector3 PredictStepPosition(Vector3 oldHitPoint, Vector3 newHitPoint, Vector3 bodyVelocity, float velocityFactor)
     {
         // 1. Get the base direction (from oldHit to newHit)

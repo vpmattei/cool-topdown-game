@@ -9,10 +9,21 @@ public class LegsManager : MonoBehaviour
     [SerializeField] private LayerMask terrainLayer;
 
     [Header("Movement Settings")]
-    [SerializeField] private float stepDistance = 10f;   // The threshold after which movement should start
-    [SerializeField] private float moveDuration = 2f;    // How long each leg moves
-    [SerializeField] private float stepHeight = 4f;      // How high each leg goes
-    [SerializeField] private float legInterval = 1f;     // Time interval between legs starting movement
+    [Tooltip("The threshold after which movement should start")]
+    [SerializeField] private float stepDistance = 2;      // The threshold after which movement should start
+    
+    [Tooltip("How long it takes for each leg to move")]
+    [SerializeField] private float moveDuration = .2f;      // How long each leg moves
+
+    [Tooltip("How high each leg goes")]
+    [SerializeField] private float stepHeight = 4f;         // How high each leg goes
+
+    [Tooltip("Time interval between legs starting movement")]
+    [SerializeField] private float legInterval = .1f;       // Time interval between legs starting movement
+
+    [Tooltip("Maximum amount of Urgency that each leg can tolerate, the smaller the value, the more 'sensitive' the leg becomes, meaning it will trigger a movement more easily", order = 1)]
+    [SerializeField, Range(.1f, 1f)]
+    private float legSesitivity = 1f;     // Maximum amount of Urgency that each leg can tolerate
 
     [Header("Leg Group Settings")]
     [Tooltip("Define the group names available for the legs.")]
@@ -65,7 +76,7 @@ public class LegsManager : MonoBehaviour
         foreach (Leg urgentLeg in legs)
         {
             if (urgentLeg.SelectedGroupName == mostUrgentLegGroup &&
-                urgentLeg.LegUrgency >= 1 &&
+                urgentLeg.LegUrgency >= legSesitivity &&
                 urgentLeg.currentLegState == urgentLeg.IdleState)
             {
                 urgentLeg.StartMovevement();

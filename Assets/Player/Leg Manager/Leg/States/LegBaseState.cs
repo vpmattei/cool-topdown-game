@@ -1,6 +1,3 @@
-using System;
-using UnityEngine;
-
 public abstract class LegBaseState
 {
     public abstract void EnterState(Leg leg);

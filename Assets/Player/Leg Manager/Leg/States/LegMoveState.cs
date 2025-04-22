@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class LegMoveState : LegBaseState
@@ -17,7 +16,7 @@ public class LegMoveState : LegBaseState
     {
         leg.UpdateMove();
 
-        //leg.transform.position = leg.currentPosition;
+        leg.transform.position = leg.currentPosition;
     }
 
     public override void Update(Leg leg)
