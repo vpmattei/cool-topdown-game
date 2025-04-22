@@ -161,30 +161,17 @@ MonoBehaviour:
   moveDuration: 0.25
   stepHeight: 2
   legInterval: 0.125
+  legGroups:
+  - A
+  - B
+  - C
   legs:
   - {fileID: 2133888484}
   - {fileID: 211326310}
   - {fileID: 332148493}
   - {fileID: 226724073}
-  playerLegs:
-  - name: 
-    currentState: 0
-    group: 0
-    hasMoved: 0
-  - name: 
-    currentState: 0
-    group: 0
-    hasMoved: 0
-  - name: 
-    currentState: 0
-    group: 0
-    hasMoved: 0
-  - name: 
-    currentState: 0
-    group: 0
-    hasMoved: 0
   maxConcurrentMoves: 2
-  minGroundedLegs: 2
+  minGroundedLegs: 3
 --- !u!4 &131292816
 Transform:
   m_ObjectHideFlags: 0
@@ -443,11 +430,12 @@ MonoBehaviour:
   terrainLayer:
     serializedVersion: 2
     m_Bits: 8
-  legGroup: 0
   body: {fileID: 131292814}
   footOffset: {x: 1, y: 0.15, z: 0}
+  selectedGroupIndex: 0
   currentRotation: 0
   rotationAmount: 0
+  legsManager: {fileID: 131292815}
   stepDistance: 2
   maxRotation: 45
   velocityFactor: 0
@@ -597,11 +585,12 @@ MonoBehaviour:
   terrainLayer:
     serializedVersion: 2
     m_Bits: 8
-  legGroup: 1
   body: {fileID: 131292814}
   footOffset: {x: 0, y: 0.15, z: -1}
+  selectedGroupIndex: 1
   currentRotation: 0
   rotationAmount: 0
+  legsManager: {fileID: 131292815}
   stepDistance: 2
   maxRotation: 45
   velocityFactor: 0
@@ -895,7 +884,7 @@ Camera:
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 60.000004
-  orthographic: 0
+  orthographic: 1
   orthographic size: 5
   m_Depth: -1
   m_CullingMask:
@@ -1054,11 +1043,12 @@ MonoBehaviour:
   terrainLayer:
     serializedVersion: 2
     m_Bits: 8
-  legGroup: 1
   body: {fileID: 131292814}
   footOffset: {x: 0, y: 0.15, z: 1}
+  selectedGroupIndex: 1
   currentRotation: 0
   rotationAmount: 0
+  legsManager: {fileID: 131292815}
   stepDistance: 2
   maxRotation: 45
   velocityFactor: 0
@@ -3834,11 +3824,12 @@ MonoBehaviour:
   terrainLayer:
     serializedVersion: 2
     m_Bits: 8
-  legGroup: 0
   body: {fileID: 1030121315}
   footOffset: {x: 0, y: 0, z: 0}
+  selectedGroupIndex: 0
   currentRotation: 0
   rotationAmount: 0
+  legsManager: {fileID: 0}
   stepDistance: 2
   maxRotation: 15
   velocityFactor: 1
@@ -4069,11 +4060,12 @@ MonoBehaviour:
   terrainLayer:
     serializedVersion: 2
     m_Bits: 8
-  legGroup: 0
   body: {fileID: 1030121315}
   footOffset: {x: 0, y: 0, z: 0}
+  selectedGroupIndex: 0
   currentRotation: 0
   rotationAmount: 0
+  legsManager: {fileID: 0}
   stepDistance: 2
   maxRotation: 15
   velocityFactor: 1
@@ -4149,11 +4141,12 @@ MonoBehaviour:
   terrainLayer:
     serializedVersion: 2
     m_Bits: 8
-  legGroup: 0
   body: {fileID: 131292814}
   footOffset: {x: 0, y: 0.15, z: 0}
+  selectedGroupIndex: 0
   currentRotation: 0
   rotationAmount: 0
+  legsManager: {fileID: 131292815}
   stepDistance: 2
   maxRotation: 45
   velocityFactor: 0
@@ -4404,10 +4397,10 @@ MonoBehaviour:
   moveDuration: 0.1
   stepHeight: 0.4
   legInterval: 0.05
+  legGroups: []
   legs:
   - {fileID: 2112414688}
   - {fileID: 1637659430}
-  playerLegs: []
   maxConcurrentMoves: 2
   minGroundedLegs: 3
 --- !u!1001 &2409866795236810007

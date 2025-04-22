@@ -1,20 +1,30 @@
 using System;
 using UnityEngine;
 
+[Serializable]
 public class Leg : MonoBehaviour
 {
     #region Inspector Fields
 
     [Header("Basic Leg Info")]
     public string legName;
+
+    // Leg State
+    public LegBaseState currentLegState;
+    public LegIdleState IdleState = new LegIdleState();
+    public LegMoveState MoveState = new LegMoveState();
+
     [SerializeField] private AnimationCurve stepCurve;
     [SerializeField] private LayerMask terrainLayer;
-    public enum LegGroup { GroupA, GroupB }
-    public LegGroup legGroup; // Assign in Inspector
 
     [Header("References")]
     public GameObject body;
     public Vector3 footOffset;
+
+    [Header("Group Selection")]
+    // This int stores the index of the group this leg belongs to.
+    [LegGroupDropdown]
+    public int selectedGroupIndex;
 
     #endregion
 
@@ -23,30 +33,25 @@ public class Leg : MonoBehaviour
     private Vector3 positionToMove;
     private Vector3 oldPosition;
     private Vector3 newPosition;
-    private Vector3 currentPosition;
-    private float moveTimer = 0f;
-    private bool isMoving = false;
-    private bool isDone = false;
-    private int movesToPerform = 0;
+    public Vector3 currentPosition {  get; private set; }
+    private float moveTimer = 0f;   // Timer that increments each frame, after the movement of the leg starts, moveTimer = [0 ... moveDuration]
     private float distanceMoved = 0f;
     [SerializeField] private float currentRotation = 0f;
     [SerializeField] private float rotationAmount = 0f;
 
-    private ProceduralLegAnimation proceduralLegAnimation;
+    [SerializeField] private LegsManager legsManager;
+    public LegsManager LegsManager => legsManager;
     private PlayerController playerController;
 
     #endregion
 
     #region Movement Settings
-
     [SerializeField] private float stepDistance = 2f;   // The threshold after which movement should start
     [SerializeField] private float maxRotation = .15f;   // The rotation threshold after which movement should start
     [SerializeField] private float velocityFactor = 1f;   // Velocity factor that adds distance to the step distance
     [SerializeField] private float moveDuration = 0.25f; // How long each leg moves
     [SerializeField] private float stepHeight = 2f;     // How high each leg goes
     [SerializeField] private float legInterval = 0.125f; // Time interval between legs starting movement
-    [Tooltip("Leg index that indicates at which order this leg will move (0 is first, 1 is second and so on...)")]
-
     #endregion
 
     #region Events
@@ -60,16 +65,8 @@ public class Leg : MonoBehaviour
 
     // Readonly properties for external checks
     public string LegName => legName;
-    public bool IsMoving => isMoving;
-    public bool IsDone => isDone;
-    public float MoveTimer => moveTimer;
 
-    // MovesToPerform as a standard property
-    public int MovesToPerform
-    {
-        get => movesToPerform;
-        set => movesToPerform = value;
-    }
+    public float MoveTimer => moveTimer;
 
     // StartMoveTime can be a simple auto-property or standard property
     public float StartMoveTime { get; set; }
@@ -93,11 +90,13 @@ public class Leg : MonoBehaviour
     void Start()
     {
         // body = transform.parent.gameObject;
-        proceduralLegAnimation = body?.GetComponent<ProceduralLegAnimation>();
+        legsManager = body?.GetComponent<LegsManager>();
         playerController = body?.GetComponent<PlayerController>();
         // footOffset = transform.localPosition;
-        isMoving = false;
-        isDone = false;
+
+        currentLegState = IdleState;
+        currentLegState.EnterState(this);
+
         moveTimer = 1f;
         if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, 30, terrainLayer))
         {
@@ -109,19 +108,21 @@ public class Leg : MonoBehaviour
 
     void Update()
     {
-        UpdatePositionToMove(); // Update target position every frame
+        //UpdatePositionToMove(); // Update only in idle state
 
-        if (isMoving)
-        {
-            UpdateMove(); // Continue moving if already in motion
-        }
+        currentLegState.Update(this);
 
         // Update rotation tracking
         rotationAmount = Mathf.Abs(body.transform.eulerAngles.y - currentRotation);
-        transform.position = currentPosition;
+        transform.position = currentPosition; // TODO: Update only in move state
     }
 
-    private void UpdatePositionToMove()
+    void FixedUpdate()
+    {
+        currentLegState.FixedUpdate(this);
+    }
+
+    public void UpdatePositionToMove()
     {
         Vector3 pivot = body.transform.position + new Vector3(0, 0.5f, 0);
         Vector3 rotatedOffset = body.transform.rotation * footOffset;
@@ -133,18 +134,24 @@ public class Leg : MonoBehaviour
         }
     }
 
-    public void StartMove(Vector3 targetPosition)
+    public void StartMovevement()
     {
         oldPosition = currentPosition;
-        newPosition = targetPosition;
-        isMoving = true;
-        isDone = false;
+        newPosition = positionToMove;
+
         moveTimer = 0f; // Reset timer
-        OnLegMovementStarted?.Invoke(this); // Started moving notification to the system
-        // currentRotation = body.transform.eulerAngles.y;  // Reset rotation
+        currentRotation = body.transform.eulerAngles.y;  // Reset rotation
+
+        // Exit Idle State
+        currentLegState.ExitState(this);
+        currentLegState = MoveState;
+        // Enter Move State
+        currentLegState.EnterState(this);
+
+        //OnLegMovementStarted?.Invoke(this); // Started moving notification to the system
     }
 
-    private void UpdateMove()
+    public void UpdateMove()
     {
         if (moveTimer < moveDuration)
         {
@@ -160,25 +167,52 @@ public class Leg : MonoBehaviour
             // Movement complete
             currentPosition = newPosition;
             oldPosition = newPosition;
-            isMoving = false;
-            isDone = true;
-            OnLegMovementFinished?.Invoke(this); // Finished moving notification to the system
-            // proceduralLegAnimation.NotifyLegMovementComplete(this);
+
             currentRotation = body.transform.eulerAngles.y;  // Reset rotation
 
+            // Exit from Move State
+            currentLegState.ExitState(this);
+            currentLegState = IdleState;
+            // Enter Idle State
+            currentLegState.EnterState(this);
+
+            //OnLegMovementFinished?.Invoke(this); // Finished moving notification to the system
         }
     }
 
-    public float CalculateUrgency()
+    /// <summary>
+    /// The actual name of the group this leg belongs to,
+    /// looked up from the leg manager’s list.
+    /// </summary>
+    public string SelectedGroupName
     {
-        // Distance urgency (normalized to stepDistance)
-        float distanceUrgency = Vector3.Distance(oldPosition, positionToMove) / stepDistance;
-        // Rotation urgency (normalized to maxRotation)
-        float rotationUrgency = rotationAmount / maxRotation;
-        // Total urgency (clamped to avoid overshooting)
-        return Mathf.Clamp01(distanceUrgency + rotationUrgency * 0.1f);
+        get
+        {
+            if (legsManager == null
+                || legsManager.legGroups == null
+                || selectedGroupIndex < 0
+                || selectedGroupIndex >= legsManager.legGroups.Count)
+            {
+                return string.Empty;
+            }
+            return legsManager.legGroups[selectedGroupIndex];
+        }
     }
 
+    public float LegUrgency
+    {
+        get
+        {    
+            // Distance urgency (normalized to stepDistance)
+            float distanceUrgency = Vector3.Distance(oldPosition, positionToMove) / stepDistance;
+            // Rotation urgency (normalized to maxRotation)
+            float rotationUrgency = rotationAmount / maxRotation;
+            // Total urgency (clamped to avoid overshooting)
+            return Mathf.Clamp01(distanceUrgency + rotationUrgency * 0.1f);
+        }
+    }
+
+    [Obsolete]
     private Vector3 PredictStepPosition(Vector3 oldHitPoint, Vector3 newHitPoint, Vector3 bodyVelocity, float velocityFactor)
     {
         // 1. Get the base direction (from oldHit to newHit)
@@ -198,8 +232,12 @@ public class Leg : MonoBehaviour
 
     public void ResetLegState()
     {
-        isMoving = false;
-        isDone = false;
+        // Exit from Any State
+        currentLegState.ExitState(this);
+        currentLegState = IdleState;
+        // Enter Idle State
+        currentLegState.EnterState(this);
+
         moveTimer = 1f;  // Reset to what you consider as the "default" state
     }
 
