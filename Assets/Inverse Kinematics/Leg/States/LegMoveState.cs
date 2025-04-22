@@ -16,11 +16,12 @@ public class LegMoveState : LegBaseState
     public override void FixedUpdate(Leg leg)
     {
         leg.UpdateMove();
+
+        //leg.transform.position = leg.currentPosition;
     }
 
     public override void Update(Leg leg)
     {
-
     }
     
     // TODO: Implement this function

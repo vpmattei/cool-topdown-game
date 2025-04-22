@@ -33,7 +33,7 @@ public class Leg : MonoBehaviour
     private Vector3 positionToMove;
     private Vector3 oldPosition;
     private Vector3 newPosition;
-    private Vector3 currentPosition;
+    public Vector3 currentPosition {  get; private set; }
     private float moveTimer = 0f;   // Timer that increments each frame, after the movement of the leg starts, moveTimer = [0 ... moveDuration]
     private float distanceMoved = 0f;
     [SerializeField] private float currentRotation = 0f;
@@ -108,13 +108,13 @@ public class Leg : MonoBehaviour
 
     void Update()
     {
-        UpdatePositionToMove(); // Update target position every frame
+        //UpdatePositionToMove(); // Update only in idle state
 
         currentLegState.Update(this);
 
         // Update rotation tracking
         rotationAmount = Mathf.Abs(body.transform.eulerAngles.y - currentRotation);
-        transform.position = currentPosition;
+        transform.position = currentPosition; // TODO: Update only in move state
     }
 
     void FixedUpdate()
@@ -122,7 +122,7 @@ public class Leg : MonoBehaviour
         currentLegState.FixedUpdate(this);
     }
 
-    private void UpdatePositionToMove()
+    public void UpdatePositionToMove()
     {
         Vector3 pivot = body.transform.position + new Vector3(0, 0.5f, 0);
         Vector3 rotatedOffset = body.transform.rotation * footOffset;
@@ -134,10 +134,13 @@ public class Leg : MonoBehaviour
         }
     }
 
-    public void StartMove(Vector3 targetPosition)
+    public void StartMovevement()
     {
         oldPosition = currentPosition;
-        newPosition = targetPosition;
+        newPosition = positionToMove;
+
+        moveTimer = 0f; // Reset timer
+        currentRotation = body.transform.eulerAngles.y;  // Reset rotation
 
         // Exit Idle State
         currentLegState.ExitState(this);
@@ -145,9 +148,7 @@ public class Leg : MonoBehaviour
         // Enter Move State
         currentLegState.EnterState(this);
 
-        moveTimer = 0f; // Reset timer
-        OnLegMovementStarted?.Invoke(this); // Started moving notification to the system
-        // currentRotation = body.transform.eulerAngles.y;  // Reset rotation
+        //OnLegMovementStarted?.Invoke(this); // Started moving notification to the system
     }
 
     public void UpdateMove()
@@ -167,21 +168,21 @@ public class Leg : MonoBehaviour
             currentPosition = newPosition;
             oldPosition = newPosition;
 
+            currentRotation = body.transform.eulerAngles.y;  // Reset rotation
+
             // Exit from Move State
             currentLegState.ExitState(this);
             currentLegState = IdleState;
             // Enter Idle State
             currentLegState.EnterState(this);
 
-            OnLegMovementFinished?.Invoke(this); // Finished moving notification to the system
-            // LegsManager.NotifyLegMovementComplete(this);
-            currentRotation = body.transform.eulerAngles.y;  // Reset rotation
+            //OnLegMovementFinished?.Invoke(this); // Finished moving notification to the system
         }
     }
 
     /// <summary>
     /// The actual name of the group this leg belongs to,
-    /// looked up from the manager’s list.
+    /// looked up from the leg manager’s list.
     /// </summary>
     public string SelectedGroupName
     {
@@ -198,14 +199,17 @@ public class Leg : MonoBehaviour
         }
     }
 
-    public float CalculateUrgency()
+    public float LegUrgency
     {
-        // Distance urgency (normalized to stepDistance)
-        float distanceUrgency = Vector3.Distance(oldPosition, positionToMove) / stepDistance;
-        // Rotation urgency (normalized to maxRotation)
-        float rotationUrgency = rotationAmount / maxRotation;
-        // Total urgency (clamped to avoid overshooting)
-        return Mathf.Clamp01(distanceUrgency + rotationUrgency * 0.1f);
+        get
+        {    
+            // Distance urgency (normalized to stepDistance)
+            float distanceUrgency = Vector3.Distance(oldPosition, positionToMove) / stepDistance;
+            // Rotation urgency (normalized to maxRotation)
+            float rotationUrgency = rotationAmount / maxRotation;
+            // Total urgency (clamped to avoid overshooting)
+            return Mathf.Clamp01(distanceUrgency + rotationUrgency * 0.1f);
+        }
     }
 
     [Obsolete]

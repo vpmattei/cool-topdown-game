@@ -17,9 +17,7 @@ public class LegsManager : MonoBehaviour
     [Header("Leg Group Settings")]
     [Tooltip("Define the group names available for the legs.")]
     public List<string> legGroups = new List<string>();
-    // TODO: Create legGroupUrgency for each legGroup
     private List<float> legGroupUrgency;
-    // TODO: Implement new mostUrgentLegGroup logic
     private string mostUrgentLegGroup = null;
     //private bool useGroupA = true;
 
@@ -27,195 +25,87 @@ public class LegsManager : MonoBehaviour
     [Header("Legs")]
     [SerializeField] private List<Leg> legs = new List<Leg>();
 
-    // TODO: Replace playerLegs with new state system
-    //[SerializeField] private List<PlayerLeg> playerLegs = new List<PlayerLeg>();
-
     [Header("Concurrency")]
-    [SerializeField] private int maxConcurrentMoves = 2; // Set this in Inspector
-    private List<Leg> activeMovingLegs = new List<Leg>();
+    private int movingLegs;
+    [SerializeField] private int maxConcurrentMovingLegs = 2; // Set this in Inspector
 
     [Header("Stability")]
-    [SerializeField] private int minGroundedLegs = 2;
-
-
-    // [Header("Separate Start Times")]
-    // [SerializeField] private bool useSeparateStartTimes = false;
-    // [SerializeField] private List<float> separateStartTimes = new List<float>();    // Make sure separateStartTimes matches legs.Count if useSeparateStartTimes is true
+    private int groundedLegs;
+    [SerializeField] private int minGroundedLegs = 3;
 
     void Start()
     {
         // Set the current active leg group to first in the list
         mostUrgentLegGroup = legGroups[0];
-        
+
         // Define the size of the legGroupUrgency List
         legGroupUrgency = new List<float>(legGroups.Count);
-
-        // Subscribe to each leg's OnLegMovementStarted and OnLegMovementFinished event
-        for (int i = 0; i < legs.Count; i++)
+        for (int i = 0; i < legGroups.Count; i++)
         {
-            var leg = legs[i];
-            leg.OnLegMovementStarted += OnLegStartedMoving;
-            leg.OnLegMovementFinished += OnLegDoneMoving;
-
-            // TODO: Replace playerLegs with new state system
-            // Set playerLegs interfaces
-            //playerLegs[i] = new PlayerLeg(leg.LegName, PlayerLeg.State.Idle, leg.legGroup);
+            legGroupUrgency.Add(0f);   // or whatever default you like
         }
     }
 
     void Update()
     {
-        // TODO: Update every leg group urgency
+        // Update every leg group urgency
         UpdateLegGroupUrgency();
 
-        // TODO: Update the current active leg group based on the overall urgency of the group
+        // Update the current active leg group based on the overall urgency of the group
         mostUrgentLegGroup = MostUrgentLegGroup;
 
+        UpdateGroundedAndMovingLegs();
         // If we don't have the minimum amount of legs grounded, don't bother moving any more extra legs, so we return
-        if (GetGroundedLegs() < minGroundedLegs) return;
+        if (groundedLegs < minGroundedLegs) return;
 
-        // TODO: Then for each leg of the current active leg group, move a leg if they have surpassed the urgency limit = 1
+        // If we surpass the max cocurrent moving legs, don't bother moving any more extra legs, so we return
+        if (movingLegs > maxConcurrentMovingLegs) return;
 
-        // Collect eligible legs in the current group
-        /*
-        List<Leg> eligibleLegs = new List<Leg>();
-        foreach (var leg in legs)
+        // Then for each leg of the current active leg group, move a leg if they have surpassed the urgency limit = 1
+        foreach (Leg urgentLeg in legs)
         {
-            // For each leg, we first
-            // Check if they are idle
-            // Then if they have an urgency >= 1 
-            // Then if the current active group is the one from the leg 
-            if (leg.currentLegState == leg.IdleState && leg.CalculateUrgency() >= 1f &&
-                leg.SelectedGroupName == (useGroupA ? Leg.LegGroup.GroupA : Leg.LegGroup.GroupB))
+            if (urgentLeg.SelectedGroupName == mostUrgentLegGroup &&
+                urgentLeg.LegUrgency >= 1 &&
+                urgentLeg.currentLegState == urgentLeg.IdleState)
             {
-                eligibleLegs.Add(leg);
+                urgentLeg.StartMovevement();
             }
         }
-
-        eligibleLegs.Sort((a, b) => b.CalculateUrgency().CompareTo(a.CalculateUrgency()));
-
-        // Move legs in the current group
-        foreach (var leg in eligibleLegs)
-        {
-            if (activeMovingLegs.Count < maxConcurrentMoves)
-            {
-                leg.StartMove(leg.PositionToMove);
-                activeMovingLegs.Add(leg);
-            }
-        }
-        */
     }
 
-    private int GetGroundedLegs()
+    private void UpdateGroundedAndMovingLegs()
     {
         int grounded = 0;
+        int moving = 0;
         foreach (var leg in legs)
         {
             if (leg.currentLegState == leg.IdleState)
             {
                 grounded++;
             }
-            //if (!leg.IsMoving) grounded++;
-        }
-        return grounded;
-    }
-
-
-    // TODO: Remove this deprecated method
-    private void SwitchActiveGroup()
-    {
-        //useGroupA = !useGroupA;
-
-        // Reset the leg state for the new active group
-        /*
-        foreach (Leg leg in legs)
-        {
-            if (leg.legGroup == (useGroupA ? Leg.LegGroup.GroupA : Leg.LegGroup.GroupB))
+            else if (leg.currentLegState == leg.MoveState)
             {
-                leg.ResetLegState();
+                moving++;
             }
         }
-        */
 
-        // TODO: Replace playerLegs with new state system
-        // Reset the playerLegs states for the new active group
-        /*foreach (PlayerLeg playerLeg in playerLegs)
-        {
-            if (playerLeg.group == (useGroupA ? Leg.LegGroup.GroupA : Leg.LegGroup.GroupB))
-            {
-                playerLeg.SetState(PlayerLeg.State.Idle);
-                playerLeg.hasMoved = false;
-            }
-        }*/
-    }
-
-    /// <summary>
-    /// Called once a leg has started moving
-    /// </summary>
-    private void OnLegStartedMoving(Leg leg)
-    {
-        // TODO: Replace playerLegs with new state system
-        // Find the this leg in the playerLegs list
-        /*for (int i = 0; i < playerLegs.Count; i++)
-        {
-            if (String.Equals(playerLegs[i].name, leg.LegName))
-            {
-                playerLegs[i].SetState(PlayerLeg.State.Moving);
-            }
-        }*/
-    }
-
-    /// <summary>
-    /// Called once a leg has finished moving,
-    /// Removes the leg from the active moving legs list
-    /// </summary>
-    private void OnLegDoneMoving(Leg leg)
-    {
-        if (activeMovingLegs.Contains(leg))
-        {
-            activeMovingLegs.Remove(leg);
-        }
-
-        //bool allLegsInCurrentGroupDone = true;
-
-        // TODO: Replace playerLegs with new state system
-        // Find the this leg in the playerLegs list
-        /*for (int i = 0; i < playerLegs.Count; i++)
-        {
-            // Check if the leg's state is not marked as 'Done Moving'
-            if (String.Equals(playerLegs[i].name, leg.LegName) && !playerLegs[i].IsDoneMoving())
-            {
-                playerLegs[i].SetState(PlayerLeg.State.DoneMoving);
-                playerLegs[i].hasMoved = true;
-                Debug.Log(playerLegs[i].GetState().ToString());
-            }
-
-            // Find all the legs in the same group as the leg that has called this event
-            // And check if they have all completed as well
-            if (playerLegs[i].group == leg.legGroup && !playerLegs[i].hasMoved)
-            {
-                Debug.Log(playerLegs[i].group.ToString());
-
-                allLegsInCurrentGroupDone = false;
-            }
-        }*/
-
-        //if (allLegsInCurrentGroupDone) SwitchActiveGroup();
+        groundedLegs = grounded;
+        movingLegs = moving;
     }
 
     private void UpdateLegGroupUrgency()
     {
         int index = 0;
 
-        foreach (string legGroupUrgencyToUpdate in legGroups)
+        foreach (string legGroupWithUrgencyToUpdate in legGroups)
         {
             float groupUrgency = 0;
 
             foreach (Leg leg in legs)
             {
-                if (leg.SelectedGroupName == legGroupUrgencyToUpdate)
+                if (leg.SelectedGroupName == legGroupWithUrgencyToUpdate)
                 {
-                    groupUrgency += leg.CalculateUrgency();
+                    groupUrgency += leg.LegUrgency;
                 }
             }
 
@@ -259,8 +149,12 @@ public class LegsManager : MonoBehaviour
 
         // Add group priority display
         GUILayout.Label("Group Priority:", style);
+        GUILayout.Label($"Most Urgent Leg Group: {mostUrgentLegGroup}", style);
         GUILayout.Label($"Group A: {(legGroupUrgency[0] >= 2 ? "PRIORITY" : legGroupUrgency[0])}", style);
         GUILayout.Label($"Group B: {(legGroupUrgency[1] >= 2 ? "PRIORITY" : legGroupUrgency[1])}", style);
+
+        GUILayout.Space(10);
+        GUILayout.Label($"Grounded Legs: {groundedLegs}", style);
 
         GUILayout.Space(10);
         GUILayout.Label("Leg States:", style);
@@ -272,7 +166,7 @@ public class LegsManager : MonoBehaviour
             if (legs[i].currentLegState == legs[i].MoveState) legStatus = "Moving";
             else legStatus = "Idle";
 
-            GUILayout.Label($"Leg {i} ({legGroupUrgency[legs[i].selectedGroupIndex]})", style);
+            GUILayout.Label($"Leg {legs[i].legName} ({legs[i].LegUrgency})", style);
             GUILayout.Label($"Status: {legStatus}", style);
             GUILayout.Space(5);
         }
