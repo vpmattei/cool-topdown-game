@@ -4,12 +4,12 @@ public class LegMoveState : LegBaseState
 {
     public override void EnterState(Leg leg)
     {
-        Debug.Log("Started moving leg: " + leg.legName);
+        //Debug.Log("Started moving leg: " + leg.legName);
     }
 
     public override void ExitState(Leg leg)
     {
-        Debug.Log("Leg stopped moving: " + leg.legName);
+        //Debug.Log("Leg stopped moving: " + leg.legName);
     }
 
     public override void FixedUpdate(Leg leg)

@@ -33,12 +33,23 @@ public class PlayerController : MonoBehaviour
     private bool isMoving = false;
     #endregion
 
+    private float groundDistanceAtStart;
+    [SerializeField, Range(1, 5)] private float desiredPlayerHeight = 2;
+    [SerializeField, Range(0.001f, .25f)] private float heightSmoothSpeed = 1;
+    [SerializeField, Range(1, 5)] private float tiltSpeed = 3;
+
+
     #region Unity Methods
     private void Awake()
     {
         rgbody = GetComponent<Rigidbody>();
         cam = Camera.main;
         animator = GetComponent<Animator>();
+    }
+
+    void Start()
+    {
+        groundDistanceAtStart = GetGroundDistance;
     }
 
     private void Update()
@@ -72,6 +83,9 @@ public class PlayerController : MonoBehaviour
 
         DrawDebugVectors();
         RotatePlayerToMousePoint();
+
+        //FollowTerrain(,)
+        FollowTerrain(heightSmoothSpeed, tiltSpeed);
     }
     #endregion
 
@@ -139,7 +153,56 @@ public class PlayerController : MonoBehaviour
     }
     #endregion
 
-    #region Ground Check and Debugging
+    #region Ground Distance
+    /// <summary>
+    /// Keeps the player at the same distance from the ground and the same angle as the ground normal
+    /// </summary>
+    /// <param name="heightSmoothSpeed">The smoothness speed at which the player changes height</param>
+    /// <param name="tiltSpeed">The tilt speed at which the player adapts to the terrain's angle</param>
+    private void FollowTerrain(float heightSmoothSpeed, float tiltSpeed)
+    {
+        Vector3 curVelocity = new Vector3();
+
+        if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, 100, groundLayer))
+        {
+            Vector3 newPos = transform.position;
+            newPos.y = hit.point.y + groundDistanceAtStart;
+
+            transform.position = Vector3.SmoothDamp(transform.position, newPos, ref curVelocity, heightSmoothSpeed);
+
+            Vector3 groundNormal = hit.normal;
+
+            // 2. Flattened forward (so you keep looking where you were looking)
+            Vector3 flattenedForward = Vector3.ProjectOnPlane(transform.forward, groundNormal).normalized;
+
+            // 3. Build rotation: forward=flattenedForward, up=groundNormal
+            Quaternion targetRot = Quaternion.LookRotation(flattenedForward, groundNormal);
+
+            // 4. Apply or smooth
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, Time.deltaTime * tiltSpeed);
+        }
+    }
+
+    /// <summary>
+    /// Returns the ground distance,
+    /// Based on this game object transform's position and the 'ground' (any object with the layer 'Ground').
+    /// </summary>
+    private float GetGroundDistance
+    {
+        get
+        {
+            float groundDist = 0;
+
+            if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit hitInfo, 100, groundLayer))
+            {
+                Debug.DrawRay(transform.position, Vector3.down * groundCheckDistance, isGrounded ? Color.blue : Color.red);
+                groundDist = transform.position.y - hitInfo.point.y;
+            }
+
+            return groundDist;
+        }
+    }
+
     /// <summary>
     /// Checks if the player is grounded using a downward raycast.
     /// </summary>
@@ -149,7 +212,7 @@ public class PlayerController : MonoBehaviour
         isGrounded = Physics.Raycast(rayOrigin, Vector3.down, groundCheckDistance, groundLayer);
         rgbody.useGravity = !isGrounded;
 
-        Debug.DrawRay(rayOrigin, Vector3.down * groundCheckDistance, isGrounded ? Color.blue : Color.red);
+        //Debug.DrawRay(rayOrigin, Vector3.down * groundCheckDistance, isGrounded ? Color.blue : Color.red);
     }
 
     /// <summary>
