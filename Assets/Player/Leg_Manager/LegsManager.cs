@@ -11,24 +11,72 @@ public class LegsManager : MonoBehaviour
     public event Action<float> OnLegIntervalValueChanged;
 
     [Header("Terrain Settings")]
+    [Tooltip("The layer that is considered the ground layer in which the legs will interact")]
     [SerializeField] private LayerMask terrainLayer;
 
     [Header("Movement Settings")]
+    #region Leg Settings
+    private float _stepDistance = 2;
+    private float _moveDuration = .2f;
+    private float _stepHeight = 4f;
+    private float _legInterval = .1f;
+
     [Tooltip("The threshold after which movement should start")]
-    [SerializeField] private float stepDistance = 2;      // The threshold after which movement should start
+    public float StepDistance
+    {
+        get {return _stepDistance;}
+        set {
+            if (_stepDistance != value)
+            {
+                _stepDistance = value;
+                OnStepDistanceValueChanged.Invoke(value);
+            }
+        }
+    }
     
     [Tooltip("How long it takes for each leg to move")]
-    [SerializeField] private float moveDuration = .2f;      // How long each leg moves
+    public float MoveDuration
+    {
+        get {return _moveDuration;}
+        set {
+            if (_moveDuration != value)
+            {
+                _moveDuration = value;
+                OnMoveDurationValueChanged.Invoke(value);
+            }
+        }
+    }
 
     [Tooltip("How high each leg goes")]
-    [SerializeField] private float stepHeight = 4f;         // How high each leg goes
+    public float StepHeight
+    {
+        get {return _stepHeight;}
+        set {
+            if (_stepHeight != value)
+            {
+                _stepHeight = value;
+                OnStepHeightValueChanged.Invoke(value);
+            }
+        }
+    }
 
     [Tooltip("Time interval between legs starting movement")]
-    [SerializeField] private float legInterval = .1f;       // Time interval between legs starting movement
+    public float LegInterval
+    {
+        get {return _legInterval;}
+        set {
+            if (_legInterval != value)
+            {
+                _legInterval = value;
+                OnLegIntervalValueChanged.Invoke(value);
+            }
+        }
+    }
 
     [Tooltip("Maximum amount of Urgency that each leg can tolerate, the smaller the value, the more 'sensitive' the leg becomes, meaning it will trigger a movement more easily", order = 1)]
     [SerializeField, Range(.1f, 1f)]
     private float legSesitivity = 1f;     // Maximum amount of Urgency that each leg can tolerate
+    #endregion
 
     [Header("Leg Group Settings")]
     [Tooltip("Define the group names available for the legs.")]
