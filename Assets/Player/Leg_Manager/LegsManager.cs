@@ -21,7 +21,7 @@ public class LegsManager : MonoBehaviour
     private float _stepHeight = 4f;
     private float _legInterval = .1f;
 
-    [Tooltip("The threshold after which movement should start")]
+    [Range(1, 4), Tooltip("The threshold after which movement should start")]
     public float StepDistance
     {
         get {return _stepDistance;}
@@ -34,7 +34,7 @@ public class LegsManager : MonoBehaviour
         }
     }
     
-    [Tooltip("How long it takes for each leg to move")]
+    [Range(0.01f, 1), Tooltip("How long it takes for each leg to move")]
     public float MoveDuration
     {
         get {return _moveDuration;}
@@ -47,7 +47,7 @@ public class LegsManager : MonoBehaviour
         }
     }
 
-    [Tooltip("How high each leg goes")]
+    [Range(.5f, 6), Tooltip("How high each leg goes")]
     public float StepHeight
     {
         get {return _stepHeight;}
@@ -60,7 +60,7 @@ public class LegsManager : MonoBehaviour
         }
     }
 
-    [Tooltip("Time interval between legs starting movement")]
+    [Range(0.01f, 1), Tooltip("Time interval between legs starting movement")]
     public float LegInterval
     {
         get {return _legInterval;}
@@ -98,6 +98,12 @@ public class LegsManager : MonoBehaviour
 
     void Start()
     {
+        // Setting subscribers
+        OnStepDistanceValueChanged += UpdateStepDistanceValueForEachLeg;
+        OnMoveDurationValueChanged += UpdateMoveDurationValueForEachLeg;
+        OnStepHeightValueChanged += UpdateStepHeightValueForEachLeg;
+        OnLegIntervalValueChanged += UpdateLegIntervalValueForEachLeg;
+
         // Set the current active leg group to first in the list
         mostUrgentLegGroup = legGroups[0];
 
@@ -134,6 +140,14 @@ public class LegsManager : MonoBehaviour
                 urgentLeg.StartMovevement();
             }
         }
+    }
+
+    void OnDisable()
+    {
+        OnStepDistanceValueChanged -= UpdateStepDistanceValueForEachLeg;
+        OnMoveDurationValueChanged -= UpdateMoveDurationValueForEachLeg;
+        OnStepHeightValueChanged -= UpdateStepHeightValueForEachLeg;
+        OnLegIntervalValueChanged -= UpdateLegIntervalValueForEachLeg;
     }
 
     private void UpdateGroundedAndMovingLegs()
@@ -199,6 +213,33 @@ public class LegsManager : MonoBehaviour
             return mostUrgentLegGroup;
         }
     }
+
+    #region Leg Event Subscribers
+    public void UpdateStepDistanceValueForEachLeg(float value){
+        foreach(Leg leg in legs)
+        {
+            leg.StepDistance = value;
+        }
+    }
+    public void UpdateMoveDurationValueForEachLeg(float value){
+        foreach(Leg leg in legs)
+        {
+            leg.MoveDuration = value;
+        }
+    }
+    public void UpdateStepHeightValueForEachLeg(float value){
+        foreach(Leg leg in legs)
+        {
+            leg.StepHeight = value;
+        }
+    }
+    public void UpdateLegIntervalValueForEachLeg(float value){
+        foreach(Leg leg in legs)
+        {
+            leg.LegInterval = value;
+        }
+    }
+    #endregion
 
     private void OnGUI()
     {
