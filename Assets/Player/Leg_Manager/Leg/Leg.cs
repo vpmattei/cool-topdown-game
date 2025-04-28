@@ -134,7 +134,7 @@ public class Leg : MonoBehaviour
         }
     }
 
-    public void StartMovevement()
+    public void StartMovement()
     {
         oldPosition = currentPosition;
         newPosition = positionToMove;

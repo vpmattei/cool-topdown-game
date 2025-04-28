@@ -16,12 +16,9 @@ public class LegsManager : MonoBehaviour
 
     [Header("Movement Settings")]
     #region Leg Settings
-    private float _stepDistance = 2;
-    private float _moveDuration = .2f;
-    private float _stepHeight = 4f;
-    private float _legInterval = .1f;
 
-    [Range(1, 4), Tooltip("The threshold after which movement should start")]
+    [SerializeField, Range(1, 4), Tooltip("The threshold after which movement should start")]
+    private float _stepDistance = 2;
     public float StepDistance
     {
         get {return _stepDistance;}
@@ -34,7 +31,9 @@ public class LegsManager : MonoBehaviour
         }
     }
     
-    [Range(0.01f, 1), Tooltip("How long it takes for each leg to move")]
+    [SerializeField, Range(0.01f, 1), Tooltip("How long it takes for each leg to move")]
+    private float _moveDuration = .2f;
+
     public float MoveDuration
     {
         get {return _moveDuration;}
@@ -47,7 +46,9 @@ public class LegsManager : MonoBehaviour
         }
     }
 
-    [Range(.5f, 6), Tooltip("How high each leg goes")]
+    [SerializeField, Range(.5f, 6), Tooltip("How high each leg goes")]
+    private float _stepHeight = 4f;
+
     public float StepHeight
     {
         get {return _stepHeight;}
@@ -60,7 +61,9 @@ public class LegsManager : MonoBehaviour
         }
     }
 
-    [Range(0.01f, 1), Tooltip("Time interval between legs starting movement")]
+    [SerializeField, Range(0.01f, 1), Tooltip("Time interval between legs starting movement")]
+    private float _legInterval = .1f;
+
     public float LegInterval
     {
         get {return _legInterval;}
@@ -96,13 +99,30 @@ public class LegsManager : MonoBehaviour
     private int groundedLegs;
     [SerializeField] private int minGroundedLegs = 3;
 
+    void OnEnable()
+    {
+        // subscribe before any OnValidate runs
+        OnStepDistanceValueChanged  += UpdateStepDistanceValueForEachLeg;
+        OnMoveDurationValueChanged  += UpdateMoveDurationValueForEachLeg;
+        OnStepHeightValueChanged    += UpdateStepHeightValueForEachLeg;
+        OnLegIntervalValueChanged   += UpdateLegIntervalValueForEachLeg;
+    }
+
+    void OnDisable()
+    {
+        OnStepDistanceValueChanged -= UpdateStepDistanceValueForEachLeg;
+        OnMoveDurationValueChanged -= UpdateMoveDurationValueForEachLeg;
+        OnStepHeightValueChanged -= UpdateStepHeightValueForEachLeg;
+        OnLegIntervalValueChanged -= UpdateLegIntervalValueForEachLeg;
+    }
+
     void Start()
     {
-        // Setting subscribers
-        OnStepDistanceValueChanged += UpdateStepDistanceValueForEachLeg;
-        OnMoveDurationValueChanged += UpdateMoveDurationValueForEachLeg;
-        OnStepHeightValueChanged += UpdateStepHeightValueForEachLeg;
-        OnLegIntervalValueChanged += UpdateLegIntervalValueForEachLeg;
+        // Setting leg values
+        UpdateStepDistanceValueForEachLeg(_stepDistance);
+        UpdateMoveDurationValueForEachLeg(_moveDuration);
+        UpdateStepHeightValueForEachLeg(_stepHeight);
+        UpdateLegIntervalValueForEachLeg(_legInterval);
 
         // Set the current active leg group to first in the list
         mostUrgentLegGroup = legGroups[0];
@@ -137,17 +157,9 @@ public class LegsManager : MonoBehaviour
                 urgentLeg.LegUrgency >= legSesitivity &&
                 urgentLeg.currentLegState == urgentLeg.IdleState)
             {
-                urgentLeg.StartMovevement();
+                urgentLeg.StartMovement();
             }
         }
-    }
-
-    void OnDisable()
-    {
-        OnStepDistanceValueChanged -= UpdateStepDistanceValueForEachLeg;
-        OnMoveDurationValueChanged -= UpdateMoveDurationValueForEachLeg;
-        OnStepHeightValueChanged -= UpdateStepHeightValueForEachLeg;
-        OnLegIntervalValueChanged -= UpdateLegIntervalValueForEachLeg;
     }
 
     private void UpdateGroundedAndMovingLegs()
@@ -215,25 +227,29 @@ public class LegsManager : MonoBehaviour
     }
 
     #region Leg Event Subscribers
-    public void UpdateStepDistanceValueForEachLeg(float value){
+    public void UpdateStepDistanceValueForEachLeg(float value)
+    {
         foreach(Leg leg in legs)
         {
             leg.StepDistance = value;
         }
     }
-    public void UpdateMoveDurationValueForEachLeg(float value){
+    public void UpdateMoveDurationValueForEachLeg(float value)
+    {
         foreach(Leg leg in legs)
         {
             leg.MoveDuration = value;
         }
     }
-    public void UpdateStepHeightValueForEachLeg(float value){
+    public void UpdateStepHeightValueForEachLeg(float value)
+    {
         foreach(Leg leg in legs)
         {
             leg.StepHeight = value;
         }
     }
-    public void UpdateLegIntervalValueForEachLeg(float value){
+    public void UpdateLegIntervalValueForEachLeg(float value)
+    {
         foreach(Leg leg in legs)
         {
             leg.LegInterval = value;
