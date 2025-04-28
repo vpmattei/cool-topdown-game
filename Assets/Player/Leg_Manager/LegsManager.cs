@@ -286,7 +286,7 @@ public class LegsManager : MonoBehaviour
             if (legs[i].currentLegState == legs[i].MoveState) legStatus = "Moving";
             else legStatus = "Idle";
 
-            GUILayout.Label($"Leg {legs[i].legName} ({legs[i].LegUrgency})", style);
+            GUILayout.Label($"{legs[i].name} ({legs[i].LegUrgency})", style);
             GUILayout.Label($"Status: {legStatus}", style);
             GUILayout.Space(5);
         }

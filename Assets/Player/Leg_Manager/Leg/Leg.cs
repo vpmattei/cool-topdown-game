@@ -7,8 +7,6 @@ public class Leg : MonoBehaviour
     #region Inspector Fields
 
     [Header("Basic Leg Info")]
-    public string legName;
-
     // Leg State
     public LegBaseState currentLegState;
     public LegIdleState IdleState = new LegIdleState();
@@ -64,8 +62,6 @@ public class Leg : MonoBehaviour
     #region Properties
 
     // Readonly properties for external checks
-    public string LegName => legName;
-
     public float MoveTimer => moveTimer;
 
     // StartMoveTime can be a simple auto-property or standard property

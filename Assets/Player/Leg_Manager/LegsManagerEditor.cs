@@ -6,37 +6,24 @@ public class LegsManagerEditor : Editor
 {
     public override void OnInspectorGUI()
     {
-        // Grab the target object
+        serializedObject.Update();
+
+        // 1) Draw all serialized fields normally
+        DrawDefaultInspector();
+
+        // 2) Now draw your custom sliders (they’ll overwrite the ones drawn by DrawDefaultInspector)
+        EditorGUILayout.Space();
+        EditorGUILayout.LabelField("Custom Leg Settings", EditorStyles.boldLabel);
+
         var mgr = (LegsManager)target;
+        mgr.StepDistance = EditorGUILayout.Slider("Step Distance", mgr.StepDistance, 1f, 4f);
+        mgr.MoveDuration = EditorGUILayout.Slider("Move Duration", mgr.MoveDuration, 0.01f, 1f);
+        mgr.StepHeight = EditorGUILayout.Slider("Step Height", mgr.StepHeight, 0.5f, 6f);
+        mgr.LegInterval = EditorGUILayout.Slider("Leg Interval", mgr.LegInterval, 0.01f, 1f);
 
-        // Start listening for changes
-        EditorGUI.BeginChangeCheck();
+        if (GUI.changed)
+            EditorUtility.SetDirty(target);
 
-        // Now draw your sliders, binding them to the PROPERTIES, not the raw fields:
-        mgr.StepDistance = EditorGUILayout.Slider(
-            new GUIContent("Step Distance", "The threshold after which movement should start"),
-            mgr.StepDistance, 1f, 4f);
-
-        mgr.MoveDuration = EditorGUILayout.Slider(
-            new GUIContent("Move Duration", "How long it takes for each leg to move"),
-            mgr.MoveDuration, 0.01f, 1f);
-
-        mgr.StepHeight = EditorGUILayout.Slider(
-            new GUIContent("Step Height", "How high each leg goes"),
-            mgr.StepHeight, 0.5f, 6f);
-
-        mgr.LegInterval = EditorGUILayout.Slider(
-            new GUIContent("Leg Interval", "Time interval between legs starting movement"),
-            mgr.LegInterval, 0.01f, 1f);
-
-        // Draw all default fields except the four sliders (we handle those ourselves)
-        DrawPropertiesExcluding(serializedObject,
-            "_stepDistance", "_moveDuration", "_stepHeight", "_legInterval");
-
-        // If anything changed, mark dirty so Unity serializes it
-        if (EditorGUI.EndChangeCheck())
-        {
-            EditorUtility.SetDirty(mgr);
-        }
+        serializedObject.ApplyModifiedProperties();
     }
 }
