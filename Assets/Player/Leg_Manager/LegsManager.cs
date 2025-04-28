@@ -5,6 +5,11 @@ using UnityEngine;
 
 public class LegsManager : MonoBehaviour
 {
+    public event Action<float> OnStepDistanceValueChanged;
+    public event Action<float> OnMoveDurationValueChanged;
+    public event Action<float> OnStepHeightValueChanged;
+    public event Action<float> OnLegIntervalValueChanged;
+
     [Header("Terrain Settings")]
     [SerializeField] private LayerMask terrainLayer;
 
@@ -30,7 +35,6 @@ public class LegsManager : MonoBehaviour
     public List<string> legGroups = new List<string>();
     private List<float> legGroupUrgency;
     private string mostUrgentLegGroup = null;
-    //private bool useGroupA = true;
 
 
     [Header("Legs")]
