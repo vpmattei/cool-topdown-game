@@ -187,7 +187,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1b7683349b2534407967b849a9127cbe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  legName: R2
   stepCurve:
     serializedVersion: 2
     m_Curve:
@@ -225,17 +224,9 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8
   body: {fileID: 131292814}
-  footOffset: {x: 1, y: 0.15, z: 0}
-  selectedGroupIndex: 1
-  currentRotation: 0
-  rotationAmount: 0
+  selectedGroupIndex: 0
   legsManager: {fileID: 131292815}
-  stepDistance: 2
   maxRotation: 45
-  velocityFactor: 1
-  moveDuration: 0.25
-  stepHeight: 2
-  legInterval: 0.125
 --- !u!65 &211326311
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -342,7 +333,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1b7683349b2534407967b849a9127cbe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  legName: L2
   stepCurve:
     serializedVersion: 2
     m_Curve:
@@ -380,17 +370,9 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8
   body: {fileID: 131292814}
-  footOffset: {x: 0, y: 0.15, z: -1}
   selectedGroupIndex: 1
-  currentRotation: 0
-  rotationAmount: 0
   legsManager: {fileID: 131292815}
-  stepDistance: 2
   maxRotation: 45
-  velocityFactor: 1
-  moveDuration: 0.25
-  stepHeight: 2
-  legInterval: 0.125
 --- !u!65 &226724074
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -880,7 +862,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1b7683349b2534407967b849a9127cbe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  legName: R1
   stepCurve:
     serializedVersion: 2
     m_Curve:
@@ -918,17 +899,9 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8
   body: {fileID: 131292814}
-  footOffset: {x: 0, y: 0.15, z: 1}
   selectedGroupIndex: 1
-  currentRotation: 0
-  rotationAmount: 0
   legsManager: {fileID: 131292815}
-  stepDistance: 2
   maxRotation: 45
-  velocityFactor: 1
-  moveDuration: 0.25
-  stepHeight: 2
-  legInterval: 0.125
 --- !u!65 &332148494
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1157,7 +1130,7 @@ PrefabInstance:
       objectReference: {fileID: 131292815}
     - target: {fileID: 6394847752924564413, guid: b2fe4c48937ad4767bf8b61f4bcbd53d, type: 3}
       propertyPath: selectedGroupIndex
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6787415830307899217, guid: b2fe4c48937ad4767bf8b61f4bcbd53d, type: 3}
       propertyPath: m_Name
@@ -1908,7 +1881,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1b7683349b2534407967b849a9127cbe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  legName: R1
   stepCurve:
     serializedVersion: 2
     m_Curve:
@@ -1946,17 +1918,9 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8
   body: {fileID: 131292814}
-  footOffset: {x: 0, y: 0.15, z: 1}
   selectedGroupIndex: 1
-  currentRotation: 0
-  rotationAmount: 0
   legsManager: {fileID: 131292815}
-  stepDistance: 2
   maxRotation: 45
-  velocityFactor: 1
-  moveDuration: 0.25
-  stepHeight: 2
-  legInterval: 0.125
 --- !u!65 &1781462249
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2078,7 +2042,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1b7683349b2534407967b849a9127cbe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  legName: R1
   stepCurve:
     serializedVersion: 2
     m_Curve:
@@ -2116,17 +2079,9 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8
   body: {fileID: 131292814}
-  footOffset: {x: 0, y: 0.15, z: 1}
-  selectedGroupIndex: 1
-  currentRotation: 0
-  rotationAmount: 0
+  selectedGroupIndex: 0
   legsManager: {fileID: 131292815}
-  stepDistance: 2
   maxRotation: 45
-  velocityFactor: 1
-  moveDuration: 0.25
-  stepHeight: 2
-  legInterval: 0.125
 --- !u!65 &1784099095
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2412,8 +2367,20 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 5232677008458687014, guid: 26f7619e9146e4f29b1b2e55472b5a1e, type: 3}
+      propertyPath: _stepHeight
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5232677008458687014, guid: 26f7619e9146e4f29b1b2e55472b5a1e, type: 3}
+      propertyPath: _legInterval
+      value: 0.05
+      objectReference: {fileID: 0}
+    - target: {fileID: 5232677008458687014, guid: 26f7619e9146e4f29b1b2e55472b5a1e, type: 3}
+      propertyPath: _moveDuration
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5232677008458687014, guid: 26f7619e9146e4f29b1b2e55472b5a1e, type: 3}
       propertyPath: _stepDistance
-      value: 2
+      value: 1.5
       objectReference: {fileID: 0}
     - target: {fileID: 5232677008458687014, guid: 26f7619e9146e4f29b1b2e55472b5a1e, type: 3}
       propertyPath: legs.Array.size
@@ -2457,11 +2424,15 @@ PrefabInstance:
       objectReference: {fileID: 211326310}
     - target: {fileID: 5232677008458687014, guid: 26f7619e9146e4f29b1b2e55472b5a1e, type: 3}
       propertyPath: legGroups.Array.size
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 5232677008458687014, guid: 26f7619e9146e4f29b1b2e55472b5a1e, type: 3}
       propertyPath: 'legGroups.Array.data[2]'
       value: C
+      objectReference: {fileID: 0}
+    - target: {fileID: 5232677008458687014, guid: 26f7619e9146e4f29b1b2e55472b5a1e, type: 3}
+      propertyPath: 'legGroups.Array.data[3]'
+      value: D
       objectReference: {fileID: 0}
     - target: {fileID: 5232677008458687014, guid: 26f7619e9146e4f29b1b2e55472b5a1e, type: 3}
       propertyPath: maxConcurrentMovingLegs
@@ -2534,7 +2505,7 @@ PrefabInstance:
       objectReference: {fileID: 131292815}
     - target: {fileID: 6394847752924564413, guid: b2fe4c48937ad4767bf8b61f4bcbd53d, type: 3}
       propertyPath: selectedGroupIndex
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6787415830307899217, guid: b2fe4c48937ad4767bf8b61f4bcbd53d, type: 3}
       propertyPath: m_Name

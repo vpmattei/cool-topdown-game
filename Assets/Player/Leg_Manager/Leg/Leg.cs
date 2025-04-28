@@ -5,8 +5,6 @@ using UnityEngine;
 public class Leg : MonoBehaviour
 {
     #region Inspector Fields
-
-    [Header("Basic Leg Info")]
     // Leg State
     public LegBaseState currentLegState;
     public LegIdleState IdleState = new LegIdleState();
@@ -17,7 +15,7 @@ public class Leg : MonoBehaviour
 
     [Header("References")]
     public GameObject body;
-    public Vector3 footOffset;
+    private Vector3 footOffset;
 
     [Header("Group Selection")]
     // This int stores the index of the group this leg belongs to.
@@ -34,8 +32,8 @@ public class Leg : MonoBehaviour
     public Vector3 currentPosition {  get; private set; }
     private float moveTimer = 0f;   // Timer that increments each frame, after the movement of the leg starts, moveTimer = [0 ... moveDuration]
     private float distanceMoved = 0f;
-    [SerializeField] private float currentRotation = 0f;
-    [SerializeField] private float rotationAmount = 0f;
+    private float currentRotation = 0f;
+    private float rotationAmount = 0f;
 
     [SerializeField] private LegsManager legsManager;
     public LegsManager LegsManager => legsManager;
@@ -44,12 +42,12 @@ public class Leg : MonoBehaviour
     #endregion
 
     #region Movement Settings
-    [SerializeField] private float stepDistance = 2f;   // The threshold after which movement should start
+    private float stepDistance = 2f;   // The threshold after which movement should start
     [SerializeField] private float maxRotation = .15f;   // The rotation threshold after which movement should start
-    [SerializeField] private float velocityFactor = 1f;   // Velocity factor that adds distance to the step distance
-    [SerializeField] private float moveDuration = 0.25f; // How long each leg moves
-    [SerializeField] private float stepHeight = 2f;     // How high each leg goes
-    [SerializeField] private float legInterval = 0.125f; // Time interval between legs starting movement
+    private float velocityFactor = 1f;   // Velocity factor that adds distance to the step distance
+    private float moveDuration = 0.25f; // How long each leg moves
+    private float stepHeight = 2f;     // How high each leg goes
+    private float legInterval = 0.125f; // Time interval between legs starting movement
     #endregion
 
     #region Events

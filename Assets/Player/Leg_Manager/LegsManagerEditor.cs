@@ -8,8 +8,9 @@ public class LegsManagerEditor : Editor
     {
         serializedObject.Update();
 
-        // 1) Draw all serialized fields normally
-        DrawDefaultInspector();
+        // Draw all fields _except_ our four backing fields
+        DrawPropertiesExcluding(serializedObject,
+            "_stepDistance", "_moveDuration", "_stepHeight", "_legInterval");
 
         // 2) Now draw your custom sliders (they’ll overwrite the ones drawn by DrawDefaultInspector)
         EditorGUILayout.Space();
