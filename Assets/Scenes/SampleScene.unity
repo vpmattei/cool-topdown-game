@@ -868,7 +868,7 @@ PrefabInstance:
       objectReference: {fileID: 131292815}
     - target: {fileID: 6394847752924564413, guid: b2fe4c48937ad4767bf8b61f4bcbd53d, type: 3}
       propertyPath: selectedGroupIndex
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6787415830307899217, guid: b2fe4c48937ad4767bf8b61f4bcbd53d, type: 3}
       propertyPath: m_Name
@@ -1920,7 +1920,7 @@ PrefabInstance:
       objectReference: {fileID: 131292815}
     - target: {fileID: 6394847752924564413, guid: b2fe4c48937ad4767bf8b61f4bcbd53d, type: 3}
       propertyPath: selectedGroupIndex
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6787415830307899217, guid: b2fe4c48937ad4767bf8b61f4bcbd53d, type: 3}
       propertyPath: m_Name
@@ -2033,7 +2033,7 @@ PrefabInstance:
       objectReference: {fileID: 131292815}
     - target: {fileID: 6394847752924564413, guid: b2fe4c48937ad4767bf8b61f4bcbd53d, type: 3}
       propertyPath: selectedGroupIndex
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6787415830307899217, guid: b2fe4c48937ad4767bf8b61f4bcbd53d, type: 3}
       propertyPath: m_Name
@@ -2482,6 +2482,10 @@ PrefabInstance:
       propertyPath: legsManager
       value: 
       objectReference: {fileID: 131292815}
+    - target: {fileID: 6394847752924564413, guid: b2fe4c48937ad4767bf8b61f4bcbd53d, type: 3}
+      propertyPath: selectedGroupIndex
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6787415830307899217, guid: b2fe4c48937ad4767bf8b61f4bcbd53d, type: 3}
       propertyPath: m_Name
       value: Leg_L1

@@ -131,7 +131,7 @@ public class Leg : MonoBehaviour
     public void StartMovement()
     {
         oldPosition = currentPosition;
-        newPosition = positionToMove + new Vector3(0, .15f, 0);
+        newPosition = positionToMove + new Vector3(0, transform.localScale.y/2, 0); // We add the height of the object divided by two, to make sure the bottom of the foot touches the ground and that it is not clipping the ground
 
         moveTimer = 0f; // Reset timer
         currentRotation = body.transform.eulerAngles.y;  // Reset rotation

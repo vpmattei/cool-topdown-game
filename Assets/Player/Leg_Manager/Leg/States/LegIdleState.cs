@@ -20,7 +20,7 @@ public class LegIdleState : LegBaseState
     public override void Update(Leg leg)
     {
         leg.transform.position = leg.currentPosition;   // Stay at the same position relative to the world position
-        leg.transform.eulerAngles = new Vector3(leg.transform.rotation.x, leg.currentRotation, leg.transform.rotation.z);
+        leg.transform.eulerAngles = new Vector3(0, leg.currentRotation, 0);
 
         leg.UpdatePositionToMove(); // Update target position every frame
     }
