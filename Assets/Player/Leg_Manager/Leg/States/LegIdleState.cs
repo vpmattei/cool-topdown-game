@@ -14,11 +14,14 @@ public class LegIdleState : LegBaseState
 
     public override void FixedUpdate(Leg leg)
     {
-
+        //leg.transform.position = leg.currentPosition;
     }
 
     public override void Update(Leg leg)
     {
+        leg.transform.position = leg.currentPosition;   // Stay at the same position relative to the world position
+        leg.transform.eulerAngles = new Vector3(leg.transform.rotation.x, leg.currentRotation, leg.transform.rotation.z);
+
         leg.UpdatePositionToMove(); // Update target position every frame
     }
 }

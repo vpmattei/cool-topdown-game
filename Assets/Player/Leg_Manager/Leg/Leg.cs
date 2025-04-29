@@ -32,7 +32,7 @@ public class Leg : MonoBehaviour
     public Vector3 currentPosition {  get; private set; }
     private float moveTimer = 0f;   // Timer that increments each frame, after the movement of the leg starts, moveTimer = [0 ... moveDuration]
     private float distanceMoved = 0f;
-    private float currentRotation = 0f;
+    public float currentRotation { get; private set; } = 0f;
     private float rotationAmount = 0f;
 
     [SerializeField] private LegsManager legsManager;
@@ -131,7 +131,7 @@ public class Leg : MonoBehaviour
     public void StartMovement()
     {
         oldPosition = currentPosition;
-        newPosition = positionToMove;
+        newPosition = positionToMove + new Vector3(0, .15f, 0);
 
         moveTimer = 0f; // Reset timer
         currentRotation = body.transform.eulerAngles.y;  // Reset rotation

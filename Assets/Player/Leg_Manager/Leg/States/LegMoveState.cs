@@ -21,6 +21,7 @@ public class LegMoveState : LegBaseState
 
     public override void Update(Leg leg)
     {
+        leg.UpdatePositionToMove(); // Update target position every frame
     }
     
     // TODO: Implement this function
