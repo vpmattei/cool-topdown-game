@@ -7,6 +7,4 @@ public abstract class LegBaseState
     public abstract void FixedUpdate(Leg leg);
 
     public abstract void Update(Leg leg);
-
-    public abstract void LateUpdate(Leg leg);
 }
