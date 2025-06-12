@@ -102,8 +102,6 @@ public class Leg : MonoBehaviour
 
     void Update()
     {
-        //UpdatePositionToMove(); // Update only in idle state
-
         currentLegState.Update(this);
 
         // Update rotation tracking
@@ -114,6 +112,11 @@ public class Leg : MonoBehaviour
     void FixedUpdate()
     {
         currentLegState.FixedUpdate(this);
+    }
+
+    void LateUpdate()
+    {
+        currentLegState.LateUpdate(this);
     }
 
     public void UpdatePositionToMove()
