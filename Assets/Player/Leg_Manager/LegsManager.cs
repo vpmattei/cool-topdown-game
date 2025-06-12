@@ -270,8 +270,8 @@ public class LegsManager : MonoBehaviour
         // Add group priority display
         GUILayout.Label("Group Priority:", style);
         GUILayout.Label($"Most Urgent Leg Group: {mostUrgentLegGroup}", style);
-        GUILayout.Label($"Group A: {(legGroupUrgency[0] >= 2 ? "PRIORITY" : legGroupUrgency[0])}", style);
-        GUILayout.Label($"Group B: {(legGroupUrgency[1] >= 2 ? "PRIORITY" : legGroupUrgency[1])}", style);
+        GUILayout.Label($"Group A: {(legGroupUrgency[0] >= 4 ? "PRIORITY" : legGroupUrgency[0])}", style);
+        GUILayout.Label($"Group B: {(legGroupUrgency[1] >= 4 ? "PRIORITY" : legGroupUrgency[1])}", style);
 
         GUILayout.Space(10);
         GUILayout.Label($"Grounded Legs: {groundedLegs}", style);
