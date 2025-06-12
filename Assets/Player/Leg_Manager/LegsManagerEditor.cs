@@ -12,7 +12,7 @@ public class LegsManagerEditor : Editor
         EditorGUILayout.LabelField("Custom Leg Settings", EditorStyles.boldLabel);
 
         var mgr = (LegsManager)target;
-        mgr.StepDistance = EditorGUILayout.Slider("Step Distance", mgr.StepDistance, 1f, 4f);
+        mgr.StepDistance = EditorGUILayout.Slider("Step Distance", mgr.StepDistance, .1f, 4f);
         mgr.MoveDuration = EditorGUILayout.Slider("Move Duration", mgr.MoveDuration, 0.01f, 1f);
         mgr.StepHeight = EditorGUILayout.Slider("Step Height", mgr.StepHeight, 0.5f, 6f);
         mgr.LegInterval = EditorGUILayout.Slider("Leg Interval", mgr.LegInterval, 0.01f, 1f);
